@@ -4,7 +4,7 @@ import type { RootState } from '../../App/store';
 export const hostelApi = createApi({
   reducerPath: 'hostelApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:5000/api/',
+    baseUrl: 'https://unihaven-hostel-finder-backnd.onrender.com/api/',
     // This prepareHeaders function automatically injects the token for PROTECTED routes
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as RootState).auth.token; // Adjust based on your AuthSlice

@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const authApi = createApi({
   reducerPath: 'authApi',
   // Base URL pointing to your Express Auth Router
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:5000/api/auth/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'https://unihaven-hostel-finder-backnd.onrender.com/api/auth/' }),
   tagTypes: ['Auth'],
   endpoints: (builder) => ({
     

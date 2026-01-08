@@ -20,7 +20,7 @@ export interface Room {
 export const roomApi = createApi({
   reducerPath: 'roomApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:5000/api/',
+    baseUrl: 'https://unihaven-hostel-finder-backnd.onrender.com/api/',
     prepareHeaders: (headers, { getState }) => {
       // Pulling token from your persisted auth state
       const token = (getState() as RootState).auth.token;

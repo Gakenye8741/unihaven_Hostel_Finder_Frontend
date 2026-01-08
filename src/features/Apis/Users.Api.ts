@@ -4,7 +4,7 @@ import type { RootState } from '../../App/store';
 export const usersApi = createApi({
   reducerPath: 'usersApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:5000/api/',
+    baseUrl: 'https://unihaven-hostel-finder-backnd.onrender.com/api/',
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as RootState).auth.token; 
       if (token) {
