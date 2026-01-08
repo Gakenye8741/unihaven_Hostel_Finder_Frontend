@@ -30,7 +30,7 @@ export interface HostelReviewsResponse {
 export const reviewApi = createApi({
   reducerPath: 'reviewApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://unihaven-hostel-finder-backnd.onrender.com/reviews/',
+    baseUrl: 'https://unihaven-hostel-finder-backnd.onrender.com/api/reviews/',
     prepareHeaders: (headers, { getState }) => {
       // Pulling token from your AuthSlice
       const token = (getState() as RootState).auth.token; 
