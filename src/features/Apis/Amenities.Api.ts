@@ -17,7 +17,7 @@ export interface SyncAmenitiesRequest {
 export const amenityApi = createApi({
   reducerPath: 'amenityApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://unihaven-hostel-finder-backnd.onrender.com/api/amenities/',
+    baseUrl: 'https://unihavenbackend-cbg9b5gbdce6fug7.southafricanorth-01.azurewebsites.net/api/amenities/',
     // Matches your HostelApi pattern using RootState
     prepareHeaders: (headers, { getState }) => {
       const state = getState() as RootState;
