@@ -4,7 +4,7 @@ import type { RootState } from '../../App/store';
 export const usersApi = createApi({
   reducerPath: 'usersApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://unihaven-hostel-finder-backnd.onrender.com/api/',
+    baseUrl: 'https://unihavenbackend-cbg9b5gbdce6fug7.southafricanorth-01.azurewebsites.net/api/',
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as RootState).auth.token; 
       if (token) {
