@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '../../App/store'; 
-
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 // Define the Room interface for TypeScript support
 export interface Room {
   id: string;
@@ -20,7 +20,7 @@ export interface Room {
 export const roomApi = createApi({
   reducerPath: 'roomApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://unihavenbackend-cbg9b5gbdce6fug7.southafricanorth-01.azurewebsites.net/api/',
+    baseUrl: `${BASE_URL}/`,
     prepareHeaders: (headers, { getState }) => {
       // Pulling token from your persisted auth state
       const token = (getState() as RootState).auth.token;

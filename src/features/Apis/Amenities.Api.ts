@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '../../App/store'; 
 
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 export interface Amenity {
   id: string;
   name: string;
@@ -13,11 +14,10 @@ export interface SyncAmenitiesRequest {
   hostelId: string;
   amenityIds: string[];
 }
-
 export const amenityApi = createApi({
   reducerPath: 'amenityApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://unihavenbackend-cbg9b5gbdce6fug7.southafricanorth-01.azurewebsites.net/api/amenities/',
+    baseUrl: `${BASE_URL}/`,
     // Matches your HostelApi pattern using RootState
     prepareHeaders: (headers, { getState }) => {
       const state = getState() as RootState;
