@@ -17,7 +17,7 @@ export interface SyncAmenitiesRequest {
 export const amenityApi = createApi({
   reducerPath: 'amenityApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: `${BASE_URL}/amenities/`,
+    baseUrl: `${BASE_URL}/`,
     // Matches your HostelApi pattern using RootState
     prepareHeaders: (headers, { getState }) => {
       const state = getState() as RootState;
