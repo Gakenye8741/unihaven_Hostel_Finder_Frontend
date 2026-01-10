@@ -2,6 +2,9 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { ShieldCheck, Lock, AlertCircle, CheckCircle2, ArrowLeft, Loader2, Eye, EyeOff } from 'lucide-react';
 
+// --- IMPORT THE REDUX HOOK ---
+import { useResetPasswordMutation } from '../features/Apis/Auth.Api'; 
+
 // Layout Components
 import Navbar from '../Components/Navbar';
 import Footer from '../Components/Footer';
@@ -11,13 +14,14 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const token = searchParams.get('token');
 
+  // --- USE THE REDUX MUTATION ---
+  const [resetPasswordTrigger, { isLoading: isMutationLoading }] = useResetPasswordMutation();
+
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState<{ type: 'error' | 'success' | null; msg: string }>({ type: null, msg: '' });
-  const [loading, setLoading] = useState(false);
 
-  // --- Password Strength Logic ---
   const strength = useMemo(() => {
     let score = 0;
     if (!password) return 0;
@@ -42,44 +46,33 @@ const ResetPassword = () => {
     if (strength < 2) return setStatus({ type: 'error', msg: 'Please use a stronger password.' });
     if (password !== confirmPassword) return setStatus({ type: 'error', msg: 'Passwords do not match.' });
 
-    setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/auth/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, newPassword: password }),
-      });
+      // --- REPLACED FETCH WITH REDUX MUTATION ---
+      const result = await resetPasswordTrigger({ 
+        token, 
+        newPassword: password 
+      }).unwrap();
 
-      if (response.ok) {
-        setStatus({ type: 'success', msg: 'Credentials updated! Redirecting to login...' });
-        setTimeout(() => navigate('/login'), 2500);
-      } else {
-        setStatus({ type: 'error', msg: 'Link expired. Please request a new password reset.' });
-      }
-    } catch (err) {
-      setStatus({ type: 'error', msg: 'Server connection error. Please try again later.' });
-    } finally {
-      setLoading(false);
+      setStatus({ type: 'success', msg: 'Credentials updated! Redirecting to login...' });
+      setTimeout(() => navigate('/login'), 2500);
+      
+    } catch (err: any) {
+      // Handles 400, 500, and Connection errors automatically
+      const errorMsg = err?.data?.message || 'Server connection error. Please try again later.';
+      setStatus({ type: 'error', msg: errorMsg });
     }
   };
 
   return (
     <div className="bg-[#0B0F1A] min-h-screen flex flex-col font-sans text-white">
-      {/* 1. FIXED NAVBAR */}
       <Navbar />
 
-      {/* 2. MAIN CONTENT AREA */}
-      {/* Added pt-24 to prevent the fixed navbar from overlapping content */}
       <main className="flex-grow flex items-center justify-center px-4 pt-32 pb-20 relative overflow-hidden">
-        
-        {/* Background Decorative Glows */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-blue-600/5 rounded-full blur-[100px] pointer-events-none" />
-
+        
         <div className="max-w-md w-full z-10">
           <div className="bg-[#161B26]/80 backdrop-blur-xl border border-gray-800 p-8 sm:p-10 rounded-[2.5rem] shadow-2xl shadow-black/50">
             
-            {/* Form Header */}
             <div className="text-center mb-10">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-600/10 rounded-2xl text-indigo-400 mb-6 border border-indigo-500/20 ring-4 ring-indigo-500/5">
                 <ShieldCheck size={36} strokeWidth={1.5} />
@@ -88,7 +81,6 @@ const ResetPassword = () => {
               <p className="text-gray-400 text-sm">Secure your Unihaven account with a new password.</p>
             </div>
 
-            {/* Status Messages */}
             {status.msg && (
               <div className={`mb-8 flex items-start p-4 rounded-2xl text-sm border animate-in zoom-in-95 duration-300 ${
                 status.type === 'success' 
@@ -108,7 +100,6 @@ const ResetPassword = () => {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
                 
-                {/* Input: New Password */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-[0.1em] text-gray-500 ml-1">New Password</label>
                   <div className="relative group">
@@ -132,7 +123,6 @@ const ResetPassword = () => {
                     </button>
                   </div>
 
-                  {/* Password Strength Visualizer */}
                   <div className="mt-4 px-1">
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-[10px] uppercase font-black tracking-widest text-gray-600">Strength: {strengthLabels[strength]}</span>
@@ -145,7 +135,6 @@ const ResetPassword = () => {
                   </div>
                 </div>
 
-                {/* Input: Confirm Password */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-[0.1em] text-gray-500 ml-1">Confirm Identity</label>
                   <div className="relative group">
@@ -163,13 +152,12 @@ const ResetPassword = () => {
                   </div>
                 </div>
 
-                {/* Action Button */}
                 <button
                   type="submit"
-                  disabled={loading || status.type === 'success'}
+                  disabled={isMutationLoading || status.type === 'success'}
                   className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-black uppercase tracking-widest py-4.5 rounded-2xl shadow-xl shadow-indigo-600/20 transition-all transform hover:-translate-y-0.5 active:scale-[0.98] flex justify-center items-center h-14"
                 >
-                  {loading ? <Loader2 className="animate-spin" size={24} /> : 'Save New Password'}
+                  {isMutationLoading ? <Loader2 className="animate-spin" size={24} /> : 'Save New Password'}
                 </button>
               </form>
             )}
@@ -177,7 +165,6 @@ const ResetPassword = () => {
         </div>
       </main>
 
-      {/* 3. FOOTER */}
       <Footer />
     </div>
   );
