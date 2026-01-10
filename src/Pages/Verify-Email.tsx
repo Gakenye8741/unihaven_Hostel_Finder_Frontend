@@ -76,10 +76,13 @@ const VerifyEmail: React.FC = () => {
     }
   };
 
-  // Automatically check when 6 digits are typed
+  // Automatically check when 6 digits are typed - FIXED to prevent double submission
   useEffect(() => {
-    if (otp.join('').length === 6) handleVerify();
-  }, [otp]);
+    const code = otp.join('');
+    if (code.length === 6 && !isVerifying && !isVerified) {
+      handleVerify();
+    }
+  }, [otp, isVerifying, isVerified]);
 
   const handleResend = async () => {
     try {
@@ -130,7 +133,7 @@ const VerifyEmail: React.FC = () => {
             {otp.map((digit, index) => (
               <input
                 key={index}
-                ref={(el) => (inputRefs.current[index] = el)}
+               ref={(el) => { inputRefs.current[index] = el; }}
                 type="text"
                 maxLength={1}
                 value={digit}

@@ -1,10 +1,10 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '../../App/store'; 
-
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 export const hostelApi = createApi({
   reducerPath: 'hostelApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://unihaven-hostel-finder-backnd.onrender.com/api/',
+    baseUrl: `${BASE_URL}/`,
     // This prepareHeaders function automatically injects the token for PROTECTED routes
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as RootState).auth.token; // Adjust based on your AuthSlice

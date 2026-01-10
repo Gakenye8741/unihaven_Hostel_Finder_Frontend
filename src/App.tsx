@@ -77,14 +77,14 @@ const App = () => {
   return (
     <>
       {/* 2. Place Toaster here so it works on all pages */}
-      <Toaster 
+      {/* <Toaster 
         position="top-center" 
         reverseOrder={false} 
         gutter={8}
         toastOptions={{
           duration: 4000,
         }}
-      />
+      /> */}
       <RouterProvider router={router} />
     </>
   );

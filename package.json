@@ -21,6 +21,7 @@
     "daisyui": "^5.0.43",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
+    "dotenv": "^17.2.3",
     "emailjs-com": "^3.2.0",
     "file-saver": "^2.0.5",
     "framer-motion": "^12.23.0",
@@ -58,6 +59,7 @@
   "devDependencies": {
     "@eslint/js": "^9.29.0",
     "@types/file-saver": "^2.0.7",
+    "@types/node": "^25.0.3",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@types/three": "^0.178.1",

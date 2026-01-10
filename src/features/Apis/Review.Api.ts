@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '../../App/store'; 
-
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 // Define types for the Review data based on your response structure
 export interface Review {
   id: string;
@@ -30,7 +30,7 @@ export interface HostelReviewsResponse {
 export const reviewApi = createApi({
   reducerPath: 'reviewApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://unihaven-hostel-finder-backnd.onrender.com/api/reviews/',
+    baseUrl: `${BASE_URL}/reviews/`,
     prepareHeaders: (headers, { getState }) => {
       // Pulling token from your AuthSlice
       const token = (getState() as RootState).auth.token; 
