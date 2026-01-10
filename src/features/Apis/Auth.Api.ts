@@ -1,11 +1,10 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 
 export const authApi = createApi({
   reducerPath: 'authApi',
   // Base URL pointing to your Express Auth Router
-  baseQuery: fetchBaseQuery({ baseUrl: `${BASE_URL}/auth/` }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'https://unihavenbackend-cbg9b5gbdce6fug7.southafricanorth-01.azurewebsites.net/api/auth/' }),
   tagTypes: ['Auth'],
   endpoints: (builder) => ({
     

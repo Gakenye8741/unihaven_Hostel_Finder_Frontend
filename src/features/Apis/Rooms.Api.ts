@@ -20,7 +20,7 @@ export interface Room {
 export const roomApi = createApi({
   reducerPath: 'roomApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: `${BASE_URL}/`,
+    baseUrl: 'https://unihavenbackend-cbg9b5gbdce6fug7.southafricanorth-01.azurewebsites.net/api/',
     prepareHeaders: (headers, { getState }) => {
       // Pulling token from your persisted auth state
       const token = (getState() as RootState).auth.token;
