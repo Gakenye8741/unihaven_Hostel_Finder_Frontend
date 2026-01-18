@@ -13,6 +13,8 @@ import {
   ChevronDown // Added for dropdown
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../App/store';
 
 const HostelDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -38,37 +40,53 @@ const HostelDetailsPage: React.FC = () => {
   const { data: reviewData, isLoading: reviewsLoading } = useGetHostelReviewsQuery(id || '');
   const [createReview, { isLoading: isPosting }] = useCreateReviewMutation();
 
-  // --- RESERVATION HANDLER (WhatsApp) ---
-  const handleReservation = () => {
-    if (!selectedRoom) return toast.error("Please select a room first!");
-    const WhatsApp = hostel?.owner?.whatsappPhone;
-    const message = `Hi, I am interested in reserving a room at ${hostel?.name}:
-- *Room:* ${selectedRoom.label}
-- *Type:* ${selectedRoom.type}
-- *Floor:* ${selectedRoom.floor}
-- *Price:* KES ${parseFloat(selectedRoom.price).toLocaleString()}
-- *Rate:* ${selectedRoom.billingCycle}
-
-Is this unit still available for booking?`;
-
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${WhatsApp}?text=${encodedMessage}`;
-    
-    window.open(whatsappUrl, '_blank');
-  };
-
- const handleCallManager = () => {
-  console.log("Full Object from Redux:", hostel);
+ // --- RESERVATION HANDLER (WhatsApp) ---
+const handleReservation = () => {
+  if (!selectedRoom) return toast.error("Please select a room first! 🏢");
   
-  // Try accessing it via different paths to see which one works
-  const owner = hostel?.owner; 
+  const whatsappNumber = hostel?.owner?.whatsappPhone;
+  if (!whatsappNumber) return toast.error("Hostel owner hasn't provided a WhatsApp number. 📲");
+
+  // Personalization logic
+  const studentName  = useSelector((state: RootState) => state.auth.user?.username);
+  // const { isAuthenticated, user, role } = useSelector((state: RootState) => state.auth);
+  const message = `🌟 *NEW RESERVATION INQUIRY*
+Hello, my name is *${studentName}*. I found your property, *${hostel?.name}*, on Unihaven.
+
+I am interested in reserving the following unit:
+━━━━━━━━━━━━━━━━━━
+📍 *Room:* ${selectedRoom.label}
+🛏️ *Type:* ${selectedRoom.type}
+🏢 *Floor:* ${selectedRoom.floor}
+💰 *Price:* KES ${parseFloat(selectedRoom.price).toLocaleString()}
+📅 *Rate:* ${selectedRoom.billingCycle}
+━━━━━━━━━━━━━━━━━━
+
+Is this unit still available for booking? I'd appreciate more details on the next steps. 
+
+Thank you!`;
+
+  const encodedMessage = encodeURIComponent(message);
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
   
-  if (!owner) {
-    console.log("Keys found in hostel:", Object.keys(hostel || {}));
-    return toast.error("Data structure mismatch - see console");
+  window.open(whatsappUrl, '_blank');
+};
+
+// --- CALL MANAGER HANDLER ---
+const handleCallManager = () => {
+  const owner = hostel?.owner;
+  
+  if (!owner || !owner.phone) {
+    console.error("Owner data missing in Redux:", hostel);
+    return toast.error("Contact details for this manager are not available yet. 📞");
   }
 
-  window.open(`tel:${owner.phone}`);
+  // Ensure we remove any spaces or '+' if necessary, though wa.me and tel: 
+  // are usually fine with international format
+  const cleanPhone = owner.phone.replace(/\s+/g, '');
+  
+  toast.success(`Calling ${owner.fullName}...`);
+  window.open(`tel:${cleanPhone}`);
 };
 
   // --- REVIEW SUBMISSION HANDLER ---
