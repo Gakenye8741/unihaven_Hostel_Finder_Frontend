@@ -20,7 +20,7 @@ export interface Hostel {
   policy: "Mixed" | "Male Only" | "Female Only";
   isVerified: boolean;
   createdAt: string;
-  owner?: HostelOwner; // This matches your new backend structure
+  owner?: HostelOwner; 
 }
 
 export const hostelApi = createApi({
@@ -35,6 +35,8 @@ export const hostelApi = createApi({
       return headers;
     },
   }),
+  // Keep the cache for only 60 seconds to prevent "stale" data during development
+  keepUnusedDataFor: 60,
   tagTypes: ['Hostel'],
   endpoints: (builder) => ({
     
@@ -45,12 +47,23 @@ export const hostelApi = createApi({
         method: 'GET',
         params: params,
       }),
-      providesTags: ['Hostel'],
+      providesTags: (result) => 
+        result 
+          ? [...result.map(({ id }) => ({ type: 'Hostel' as const, id })), 'Hostel']
+          : ['Hostel'],
     }),
 
-    // 🔍 Get Single Hostel Details (Now with Owner)
+    // 🔍 Get Single Hostel Details
     getHostelById: builder.query<Hostel, string>({
       query: (id) => `hostels/${id}`,
+      // 1. IMPROVED TRANSFORM: 
+      // This ensures we always get the raw hostel object even if wrapped in 'data'
+      transformResponse: (response: any) => {
+        const data = response?.data || response;
+        console.log("RTK Query Transformed Data:", data); // Check your console!
+        return data;
+      },
+      // 2. CACHE VALIDATION:
       providesTags: (result, error, id) => [{ type: 'Hostel', id }],
     }),
 
