@@ -6,10 +6,11 @@ import { toast } from 'react-hot-toast';
 import { 
   ShieldCheck, Upload, ChevronLeft, FileText, Camera, 
   CheckCircle2, Loader2, AlertCircle, ArrowRight, X, Clock,
-  Fingerprint, Sparkles, ShieldAlert, LayoutDashboard, AlertTriangle, RefreshCcw, Lock
+  Fingerprint, Sparkles, ShieldAlert, LayoutDashboard, AlertTriangle, RefreshCcw, Lock,
+  ShieldHalf
 } from 'lucide-react';
 import type { RootState } from '../App/store';
-import Navbar from '../Components/Navbar'; // Ensure path is correct
+import Navbar from '../Components/Navbar'; 
 
 const ApplyOwnerPage: React.FC = () => {
   const navigate = useNavigate();
@@ -32,12 +33,16 @@ const ApplyOwnerPage: React.FC = () => {
     passportImageUrl: ""
   });
 
-  // --- LOGIC: VERIFICATION STATUS ENUM ---
+  // --- LOGIC: ROLE & VERIFICATION STATUS ---
+  const userRole = useSelector((state: RootState)=>state.auth?.role);
   const verificationStatus = profile?.identityVerificationStatus || "NOT_SUBMITTED";
   
   const isRejected = useMemo(() => verificationStatus === "REJECTED", [verificationStatus]);
   const isPending = useMemo(() => verificationStatus === "PENDING", [verificationStatus]);
   const isApproved = useMemo(() => verificationStatus === "APPROVED", [verificationStatus]);
+
+  // Check if user is already elevated (Admin or Owner)
+  const isElevated = useMemo(() => userRole === "Admin" || userRole === "Owner", [userRole]);
 
   // Guard: Only lock the screen if the audit is currently in progress or already approved
   const isLocked = useMemo(() => isPending || isApproved, [isPending, isApproved]);
@@ -148,7 +153,7 @@ const ApplyOwnerPage: React.FC = () => {
           {/* LEFT: INFORMATION ARCHITECTURE */}
           <div className="lg:col-span-5 space-y-12">
             <div className="space-y-6">
-              <div className={`w-20 h-20 rounded-[2rem] flex items-center justify-center shadow-2xl transition-all border ${isApproved ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-indigo-600/10 text-indigo-400 border-indigo-500/20'}`}>
+              <div className={`w-20 h-20 rounded-[2rem] flex items-center justify-center shadow-2xl transition-all border ${isApproved || isElevated ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-indigo-600/10 text-indigo-400 border-indigo-500/20'}`}>
                 <ShieldCheck size={40} strokeWidth={1.5} />
               </div>
               <h1 className="text-5xl md:text-6xl font-black text-white italic tracking-tighter leading-[0.9] mb-4 uppercase">
@@ -162,9 +167,9 @@ const ApplyOwnerPage: React.FC = () => {
 
             <div className="space-y-8 relative">
               <div className="absolute left-4 top-2 bottom-2 w-[1px] bg-slate-800" />
-              <RoadmapStep number="01" title="Visual Identity" desc="High-resolution captures of National ID." active={!isLocked && !!user} />
+              <RoadmapStep number="01" title="Visual Identity" desc="High-resolution captures of National ID." active={!isLocked && !isElevated && !!user} />
               <RoadmapStep number="02" title="Biometric Sync" desc="Admin cross-references data with profile." active={isPending} />
-              <RoadmapStep number="03" title="Access Granted" desc="Dashboard unlocking & listing privileges." active={isApproved} />
+              <RoadmapStep number="03" title="Access Granted" desc="Dashboard unlocking & listing privileges." active={isApproved || isElevated} />
             </div>
           </div>
 
@@ -172,6 +177,11 @@ const ApplyOwnerPage: React.FC = () => {
           <div className="lg:col-span-7">
             {!user ? (
               <UnauthenticatedState onLogin={() => navigate('/login')} />
+            ) : isElevated && userRole ? (
+              <ElevatedState 
+                role={userRole} 
+                onRedirect={() => navigate(userRole === 'Admin' ? '/admin-dashboard' : '/owner-dashboard')} 
+              />
             ) : isApproved ? (
               <ApprovedState user={user?.username} onDashboard={() => navigate('/owner-dashboard')} />
             ) : isPending ? (
@@ -234,6 +244,21 @@ const ApplyOwnerPage: React.FC = () => {
 };
 
 // --- SUB-COMPONENTS ---
+
+const ElevatedState = ({ role, onRedirect }: { role: string, onRedirect: () => void }) => (
+  <div className="bg-slate-900/40 border border-indigo-500/20 rounded-[4rem] p-16 text-center shadow-3xl animate-in fade-in zoom-in-95 duration-700">
+     <div className="bg-indigo-500/10 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-10 text-indigo-500 shadow-[0_0_60px_rgba(99,102,241,0.1)]">
+        <ShieldHalf size={44} strokeWidth={1.5} />
+     </div>
+     <h3 className="text-3xl font-black text-white italic tracking-tight mb-4 uppercase">Portal Active</h3>
+     <p className="text-slate-400 mb-12 text-sm leading-relaxed px-10">
+       You are currently recognized as an <span className="text-white font-bold">{role}</span>. There is no need for identity re-verification. Access your portal to manage listings and audits.
+     </p>
+     <button onClick={onRedirect} className="bg-white text-[#0F172A] px-12 py-6 rounded-3xl font-black text-[10px] uppercase tracking-[0.3em] shadow-2xl hover:scale-105 transition-all flex items-center gap-3 mx-auto">
+       Go to {role} Portal <ArrowRight size={16} />
+     </button>
+  </div>
+);
 
 const UnauthenticatedState = ({ onLogin }: { onLogin: () => void }) => (
   <div className="bg-slate-900/40 border border-indigo-500/20 rounded-[4rem] p-16 text-center shadow-3xl animate-in fade-in zoom-in-95 duration-700">
