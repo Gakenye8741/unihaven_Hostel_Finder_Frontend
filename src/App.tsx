@@ -1,5 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Toaster } from "react-hot-toast"; // 1. Import the Toaster
+import { Toaster } from "react-hot-toast";
 import Home from "./Pages/Home";
 import LoginPage from "./Pages/Login";
 import SearchResultsPage from "./Pages/searchResultsPage";
@@ -19,12 +19,16 @@ import RegisterPage from "./Pages/RegisterPage";
 import VerifyEmail from "./Pages/Verify-Email";
 import ApplyOwnerPage from "./Pages/ApplyHostelOwner";
 import AdminVerificationPanel from "./DashBoards/Admin-Dashboard/AdminVerificationPanel";
+import NotFound from "./Pages/NotFound"; // Import your new 404 page
+import SearchByAddress from "./Pages/SearchByAddress";
+import CampusHub from "./Pages/CampusMap";
 
 const App = () => {
   const router = createBrowserRouter([
     {
       path: '/',
-      element: <Home />
+      element: <Home />,
+      errorElement: <NotFound />, // Catch crashes/errors at the root level
     },
     {
       path: '/login',
@@ -58,9 +62,17 @@ const App = () => {
       path: '/campus/:campusName',
       element: <CampusDestinationPage />
     },
-     {
+    {
       path: '/ApplyHostelOwner',
       element: <ApplyOwnerPage />
+    },
+   {
+      path: '/search',
+      element: <SearchByAddress />
+    },
+    {
+      path: '/map',
+      element: <CampusHub />
     },
     {
       path: '/admin-dashboard',
@@ -69,6 +81,7 @@ const App = () => {
           <AdminDashBoard />
         </ProtectedRoutes>
       ),
+      errorElement: <NotFound />, // Catch sub-route errors
       children: [
         { path: "manage-hostels", element: <HostelManager /> },
         { path: "manage-rooms", element: <RoomManager /> },
@@ -76,22 +89,44 @@ const App = () => {
         { path: "manage-amenities", element: <AmenityManager /> },
         { path: "manage-reviews", element: <ReviewManager /> },
         { path: "manage-users", element: <ManageUsers /> },
-        { path: "Hostel-verifications", element: < AdminVerificationPanel/> },
+        { path: "Hostel-verifications", element: <AdminVerificationPanel /> },
       ],
     },
+    // Explicit Catch-all for 404s
+    {
+      path: "*",
+      element: <NotFound />
+    }
   ]);
 
   return (
     <>
-      {/* 2. Place Toaster here so it works on all pages */}
-      {/* <Toaster 
-        position="top-center" 
+      {/* Premium Dark Theme Toaster */}
+      <Toaster 
+        position="top-right" 
         reverseOrder={false} 
         gutter={8}
         toastOptions={{
-          duration: 4000,
+          duration: 5000,
+          style: {
+            background: '#0F172A', // Slate-900
+            color: '#F1F5F9', // Slate-100
+            border: '1px solid rgba(99, 102, 241, 0.2)', // Indigo border
+            fontSize: '12px',
+            fontWeight: '900',
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            borderRadius: '16px',
+            padding: '16px',
+          },
+          success: {
+            iconTheme: {
+              primary: '#6366F1', // Indigo-500
+              secondary: '#fff',
+            },
+          },
         }}
-      /> */}
+      />
       <RouterProvider router={router} />
     </>
   );
