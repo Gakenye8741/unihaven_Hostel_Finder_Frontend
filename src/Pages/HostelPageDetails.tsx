@@ -40,17 +40,23 @@ const HostelDetailsPage: React.FC = () => {
   const { data: reviewData, isLoading: reviewsLoading } = useGetHostelReviewsQuery(id || '');
   const [createReview, { isLoading: isPosting }] = useCreateReviewMutation();
 
- // --- RESERVATION HANDLER (WhatsApp) ---
+// 1. AT THE TOP OF YOUR COMPONENT (Outside any functions)
+const { user } = useSelector((state: RootState) => state.auth);
+
+// 2. YOUR UPDATED HANDLER
 const handleReservation = () => {
   if (!selectedRoom) return toast.error("Please select a room first! 🏢");
   
   const whatsappNumber = hostel?.owner?.whatsappPhone;
-  if (!whatsappNumber) return toast.error("Hostel owner hasn't provided a WhatsApp number. 📲");
+  if (!whatsappNumber) {
+    return toast.error("Hostel owner hasn't provided a WhatsApp number. 📲");
+  }
 
-  // Personalization logic
-  const studentName  = useSelector((state: RootState) => state.auth.user?.username);
-  // const { isAuthenticated, user, role } = useSelector((state: RootState) => state.auth);
+  // Use the user's name from the top-level selector, with a fallback
+  const studentName = user?.username || "a student";
+  
   const message = `🌟 *NEW RESERVATION INQUIRY*
+
 Hello, my name is *${studentName}*. I found your property, *${hostel?.name}*, on Unihaven.
 
 I am interested in reserving the following unit:
@@ -66,8 +72,10 @@ Is this unit still available for booking? I'd appreciate more details on the nex
 
 Thank you!`;
 
+  // Clean the number: remove '+' and any spaces
+  const cleanNumber = whatsappNumber.replace(/\D/g, ''); 
   const encodedMessage = encodeURIComponent(message);
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+  const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodedMessage}`;
   
   window.open(whatsappUrl, '_blank');
 };
