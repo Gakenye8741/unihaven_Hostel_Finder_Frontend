@@ -287,7 +287,7 @@ const handleShareHostel = async () => {
                 </div>
                 <div className="flex items-center gap-2 bg-amber-500/10 px-4 py-1.5 rounded-full border border-amber-500/20">
                
-  const body = encodeURIComponent(     <Star size={14} className="text-amber-400 fill-amber-400" />
+     <Star size={14} className="text-amber-400 fill-amber-400" />
                     <span className="text-[12px] font-black text-amber-300">{reviewData?.stats.averageRating || "0.0"}</span>
                     <span className="text-[8px] font-bold text-amber-600 uppercase tracking-widest ml-1">({reviewData?.stats.totalReviews} Reviews)</span>
                 </div>
