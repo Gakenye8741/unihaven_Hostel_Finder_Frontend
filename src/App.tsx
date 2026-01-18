@@ -18,6 +18,7 @@ import ForgotPassword from "./Pages/ForgotPassword";
 import RegisterPage from "./Pages/RegisterPage";
 import VerifyEmail from "./Pages/Verify-Email";
 import ApplyOwnerPage from "./Pages/ApplyHostelOwner";
+import AdminVerificationPanel from "./DashBoards/Admin-Dashboard/AdminVerificationPanel";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -75,6 +76,7 @@ const App = () => {
         { path: "manage-amenities", element: <AmenityManager /> },
         { path: "manage-reviews", element: <ReviewManager /> },
         { path: "manage-users", element: <ManageUsers /> },
+        { path: "Hostel-verifications", element: < AdminVerificationPanel/> },
       ],
     },
   ]);

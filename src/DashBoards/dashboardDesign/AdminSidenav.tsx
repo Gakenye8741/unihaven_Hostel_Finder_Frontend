@@ -9,7 +9,8 @@ import {
   User,
   ShieldHalf,
   Wifi,
-  GitCommitVerticalIcon
+  GitCommitVerticalIcon,
+  List
 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { clearCredentials } from "../../features/Auth/Auth.slice";
@@ -21,7 +22,7 @@ const navItems = [
   { name: "Media Gallery", path: "product-media", icon: <ImageIcon className="text-green-400" size={18} /> },
   { name: "Amenity Manager", path: "Manage-Amenities", icon: <Wifi className="text-orange-600" size={18} /> },
    { name: "Review Manager", path: "Manage-Reviews", icon: <GitCommitVerticalIcon className="text-shadow-lime-600" size={18} /> },
-  { name: "Manage Users", path: "Manage-Users", icon: <User className="text-yellow-400" size={18} /> },
+  { name: "Hostel verifications", path: "Hostel-verifications", icon: <List className="text-yellow-400" size={18} /> },
   { name: "My Profile", path: "adminprofile", icon: <User className="text-purple-400" size={18} /> },
   { name: "Settings", path: "settings", icon: <Settings className="text-teal-400" size={18} /> },
   { name: "Logout", path: "#", icon: <LogOut className="text-red-500" size={18} /> },
