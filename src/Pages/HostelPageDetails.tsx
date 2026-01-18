@@ -32,7 +32,7 @@ const HostelDetailsPage: React.FC = () => {
   const [expandedReplyId, setExpandedReplyId] = useState<string | null>(null); // For Management Dropdown
 
   // --- API QUERIES ---
-  const { data: hostel, isLoading: hostelLoading, isError: hostelError } = useGetHostelByIdQuery(id);
+  const { data: hostel, isLoading: hostelLoading, isError: hostelError } = useGetHostelByIdQuery(id || '');
   const { data: rooms, isLoading: roomsLoading } = useListRoomsByHostelQuery(id || '');
   const { data: gallery, isLoading: galleryLoading } = useGetHostelGalleryQuery(id || '');
   const { data: reviewData, isLoading: reviewsLoading } = useGetHostelReviewsQuery(id || '');
