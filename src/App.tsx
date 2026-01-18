@@ -17,6 +17,7 @@ import ResetPassword from "./Pages/ResetPassword";
 import ForgotPassword from "./Pages/ForgotPassword";
 import RegisterPage from "./Pages/RegisterPage";
 import VerifyEmail from "./Pages/Verify-Email";
+import ApplyOwnerPage from "./Pages/ApplyHostelOwner";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -55,6 +56,10 @@ const App = () => {
     {
       path: '/campus/:campusName',
       element: <CampusDestinationPage />
+    },
+     {
+      path: '/ApplyHostelOwner',
+      element: <ApplyOwnerPage />
     },
     {
       path: '/admin-dashboard',

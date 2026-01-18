@@ -5,7 +5,8 @@ import toast from "react-hot-toast";
 import { 
   LogOut, User, ChevronDown, 
   LayoutDashboard, X, Home, Search, 
-  Building2, Map, Star, Info, ShieldCheck 
+  Building2, Map, Star, Info, ShieldCheck,
+  PlusCircle // Added for Apply icon
 } from "lucide-react";
 import type { RootState } from "../App/store";
 import { clearCredentials } from "../features/Auth/Auth.slice";
@@ -18,10 +19,15 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // --- REDUX STATE ---
   const { isAuthenticated, user, role } = useSelector((state: RootState) => state.auth);
 
-  // Handle scroll effect for border and background transition
+  // Helper to check if user should see the Apply tab
+  // Hide it if they are already an Owner or Admin
+  const showApplyTab = useMemo(() => {
+    const userRole = role?.toUpperCase();
+    return userRole !== "OWNER" && userRole !== "ADMIN";
+  }, [role]);
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
@@ -31,17 +37,13 @@ const Navbar: React.FC = () => {
   const handleLogout = () => {
     dispatch(clearCredentials());
     setMenuOpen(false);
-    toast.dismiss();
     toast.success("Logged out successfully", {
       id: "logout-toast",
       icon: '🏠',
-      duration: 3000,
       style: {
-        borderRadius: '0px',
         background: '#0F172A',
-        color: '#6366F1', // Indigo theme color
+        color: '#6366F1',
         fontSize: '10px',
-        fontWeight: 'bold',
         letterSpacing: '0.2em',
         border: '1px solid #6366F1'
       },
@@ -49,31 +51,29 @@ const Navbar: React.FC = () => {
     navigate("/login");
   };
 
-  // UPDATED: Dashboard configuration mapping based on your specific roles
   const dashboardConfig = useMemo(() => {
     const userRole = role?.toUpperCase();
-    
     switch (userRole) {
-      case "ADMIN":
-        return { path: "/admin-dashboard", label: "Admin Portal" };
-      case "OWNER":
-        return { path: "/owner-dashboard", label: "Owner Portal" };
-      case "CARETAKER":
-        return { path: "/caretaker-dashboard", label: "Caretaker Portal" };
-      case "STUDENT":
-        return { path: "/student-dashboard", label: "Student Portal" };
-      default:
-        // Default fallback (e.g., for MANAGER or unknown roles)
-        return { path: "/student-dashboard", label: "User Portal" };
+      case "ADMIN": return { path: "/admin-dashboard", label: "Admin Portal" };
+      case "OWNER": return { path: "/owner-dashboard", label: "Owner Portal" };
+      case "CARETAKER": return { path: "/caretaker-dashboard", label: "Caretaker Portal" };
+      default: return { path: "/student-dashboard", label: "Student Portal" };
     }
   }, [role]);
 
-  // UniHaven Indigo Theme Macros
   const activeStyle = ({ isActive }: { isActive: boolean }) => 
     `flex items-center transition-all duration-300 py-2 border-b-2 ${
       isActive 
       ? "text-[#6366F1] border-[#6366F1]" 
       : "text-slate-400 border-transparent hover:text-[#6366F1]"
+    }`;
+
+  // Specialized style for the Apply tab to make it pop
+  const applyTabStyle = ({ isActive }: { isActive: boolean }) => 
+    `flex items-center transition-all duration-300 py-2 border-b-2 ${
+      isActive 
+      ? "text-amber-400 border-amber-400" 
+      : "text-amber-500/70 border-transparent hover:text-amber-400"
     }`;
 
   const activeMobileStyle = ({ isActive }: { isActive: boolean }) => 
@@ -82,16 +82,6 @@ const Navbar: React.FC = () => {
       ? "text-[#6366F1] bg-white/5 font-bold" 
       : "text-slate-300 hover:bg-white/5"
     }`;
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   return (
     <nav className={`fixed top-0 left-0 w-full z-[100] transition-all duration-500 border-b ${
@@ -102,7 +92,6 @@ const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
           
-          {/* LOGO SECTION - UniHaven Branding */}
           <Link to="/" className="flex items-center flex-shrink-0 group">
             <div className="relative h-10 w-10 sm:h-11 sm:w-11 mr-3 flex items-center justify-center rounded-xl border border-indigo-500/30 bg-indigo-500/10 transition-all group-hover:bg-indigo-500/20">
               <Building2 className="text-[#6366F1] group-hover:scale-110 transition-transform" size={24} />
@@ -113,18 +102,23 @@ const Navbar: React.FC = () => {
             </div>
           </Link>
 
-          {/* DESKTOP NAV links - Hostel Finder Scope */}
+          {/* DESKTOP NAV */}
           <div className="hidden lg:flex space-x-8 items-center text-[10px] uppercase tracking-[0.2em] font-bold">
             <NavLink to="/" end className={activeStyle}><Home size={13} className="mr-1.5" /> Home</NavLink>
             <NavLink to="/hostels" className={activeStyle}><Search size={13} className="mr-1.5" /> Find Hostel</NavLink>
+            
+            {/* NEW: Apply Hostel Owner Tab (Conditional) */}
+            {showApplyTab && (
+              <NavLink to="/ApplyHostelOwner" className={applyTabStyle}>
+                <PlusCircle size={13} className="mr-1.5" /> Apply to List
+              </NavLink>
+            )}
+
             <NavLink to="/map" className={activeStyle}><Map size={13} className="mr-1.5" /> Campus Map</NavLink>
-            <NavLink to="/reviews" className={activeStyle}><Star size={13} className="mr-1.5" /> Reviews</NavLink>
-            <NavLink to="/safety" className={activeStyle}><ShieldCheck size={13} className="mr-1.5" /> Safety</NavLink>
             <NavLink to="/about" className={activeStyle}><Info size={13} className="mr-1.5" /> About</NavLink>
           </div>
 
           <div className="flex items-center space-x-4">
-            {/* ACCOUNT MENU */}
             <div className="relative" ref={dropdownRef}>
               <button 
                 onClick={() => setMenuOpen(!menuOpen)}
@@ -148,8 +142,13 @@ const Navbar: React.FC = () => {
                   <div className="lg:hidden flex flex-col border-b border-white/5 pb-2 mb-2">
                     <NavLink to="/" end className={activeMobileStyle} onClick={() => setMenuOpen(false)}><Home size={16} className="mr-3" /> Home</NavLink>
                     <NavLink to="/hostels" className={activeMobileStyle} onClick={() => setMenuOpen(false)}><Search size={16} className="mr-3" /> Find Hostel</NavLink>
-                    <NavLink to="/map" className={activeMobileStyle} onClick={() => setMenuOpen(false)}><Map size={16} className="mr-3" /> Campus Map</NavLink>
-                    <NavLink to="/reviews" className={activeMobileStyle} onClick={() => setMenuOpen(false)}><Star size={16} className="mr-3" /> Reviews</NavLink>
+                    
+                    {/* MOBILE Apply Tab */}
+                    {showApplyTab && (
+                      <NavLink to="/ApplyHostelOwner" className={activeMobileStyle} onClick={() => setMenuOpen(false)}>
+                        <PlusCircle size={16} className="mr-3 text-amber-500" /> <span className="text-amber-500">Apply to List</span>
+                      </NavLink>
+                    )}
                   </div>
 
                   <div className="px-5 py-2">
