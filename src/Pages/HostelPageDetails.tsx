@@ -10,7 +10,7 @@ import {
   MapPin, ShieldCheck, Loader2, CheckCircle2, DoorOpen, 
   Search, ChevronLeft, ChevronRight, LayoutGrid, Users, Hash, Info, Star,
   ArrowRight, Phone, CreditCard, MessageSquare, Quote, UserCircle, X, Send, Plus,
-  ChevronDown // Added for dropdown
+  ChevronDown 
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -29,39 +29,39 @@ const HostelDetailsPage: React.FC = () => {
   const [isAllReviewsOpen, setIsAllReviewsOpen] = useState(false);
   const [isCreateReviewOpen, setIsCreateReviewOpen] = useState(false);
   const [reviewForm, setReviewForm] = useState({ rating: 5, title: "", comment: "" });
-  const [expandedReplyId, setExpandedReplyId] = useState<string | null>(null); // For Management Dropdown
+  const [expandedReplyId, setExpandedReplyId] = useState<string | null>(null);
 
-  // --- API QUERIES ---
-  const { data: hostel, isLoading: hostelLoading, isError: hostelError } = useGetHostelByIdQuery(id);
+const { data: hostel, isLoading: hostelLoading, isError: hostelError } = useGetHostelByIdQuery(id ?? "");
   const { data: rooms, isLoading: roomsLoading } = useListRoomsByHostelQuery(id || '');
   const { data: gallery, isLoading: galleryLoading } = useGetHostelGalleryQuery(id || '');
   const { data: reviewData, isLoading: reviewsLoading } = useGetHostelReviewsQuery(id || '');
   const [createReview, { isLoading: isPosting }] = useCreateReviewMutation();
 
-  // --- RESERVATION HANDLER (WhatsApp) ---
+  // --- UPDATED RESERVATION HANDLER (Matches Backend JSON) ---
   const handleReservation = () => {
     if (!selectedRoom) return toast.error("Please select a room first!");
 
-    const managerPhone = hostel?.managerPhone || "254700000000"; // Ensure format is 254...
+    // According to your JSON, phone is in hostel.owner.phone
+    const ownerPhone = hostel?.owner?.phone || "254700000000"; 
     const message = `Hi, I am interested in reserving a room at ${hostel?.name}:
-- *Room:* ${selectedRoom.label}
-- *Type:* ${selectedRoom.type}
+- *Room Label:* ${selectedRoom.label}
+- *Room Type:* ${selectedRoom.type}
 - *Floor:* ${selectedRoom.floor}
 - *Price:* KES ${parseFloat(selectedRoom.price).toLocaleString()}
-- *Rate:* ${selectedRoom.billingCycle}
+- *Billing:* ${selectedRoom.billingCycle}
 
 Is this unit still available for booking?`;
 
     const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${managerPhone}?text=${encodedMessage}`;
+    const whatsappUrl = `https://wa.me/${ownerPhone}?text=${encodedMessage}`;
     
     window.open(whatsappUrl, '_blank');
   };
 
-  // --- CALL HANDLER ---
+  // --- UPDATED CALL HANDLER (Matches Backend JSON) ---
   const handleCallManager = () => {
-    const managerPhone = hostel?.managerPhone || "254700000000";
-    window.open(`tel:${managerPhone}`);
+    const ownerPhone = hostel?.owner?.phone || "254700000000";
+    window.open(`tel:${ownerPhone}`);
   };
 
   // --- REVIEW SUBMISSION HANDLER ---
@@ -185,7 +185,9 @@ Is this unit still available for booking?`;
           <section>
             <div className="flex items-center gap-3 text-[#6366F1] mb-4">
               <ShieldCheck size={20} />
-              <span className="font-black tracking-[0.3em] text-[10px] uppercase italic">Verified Student Housing</span>
+              <span className="font-black tracking-[0.3em] text-[10px] uppercase italic">
+                {hostel.isVerified ? 'Verified Student Housing' : 'Awaiting Verification'}
+              </span>
             </div>
             <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase italic leading-none mb-4">{hostel.name}</h1>
             <div className="flex flex-wrap items-center gap-6">
@@ -197,6 +199,9 @@ Is this unit still available for booking?`;
                     <Star size={14} className="text-amber-400 fill-amber-400" />
                     <span className="text-[12px] font-black text-amber-300">{reviewData?.stats.averageRating || "0.0"}</span>
                     <span className="text-[8px] font-bold text-amber-600 uppercase tracking-widest ml-1">({reviewData?.stats.totalReviews} Reviews)</span>
+                </div>
+                <div className="text-[10px] font-black text-indigo-400 uppercase tracking-widest bg-indigo-500/10 px-3 py-1 rounded-md border border-indigo-500/20">
+                  {hostel.policy}
                 </div>
             </div>
           </section>
@@ -355,7 +360,6 @@ Is this unit still available for booking?`;
                       <div className="flex items-center gap-4">
                         <span className="text-[9px] font-bold text-slate-700">{new Date(review.createdAt).toLocaleDateString()}</span>
                         
-                        {/* MANAGEMENT DROPDOWN BUTTON */}
                         {review.ownerReply && (
                             <button 
                               onClick={() => setExpandedReplyId(expandedReplyId === review.id ? null : review.id)}
@@ -368,7 +372,6 @@ Is this unit still available for booking?`;
                       </div>
                     </div>
 
-                    {/* MANAGEMENT RESPONSE CONTENT (DROPDOWN) */}
                     {expandedReplyId === review.id && review.ownerReply && (
                       <div className="mt-6 p-6 bg-indigo-500/5 border-l-2 border-indigo-500 rounded-r-3xl animate-in slide-in-from-top-4 duration-300">
                         <p className="text-[8px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-2">Management Response</p>
