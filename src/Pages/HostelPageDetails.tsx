@@ -8,7 +8,7 @@ import { useGetHostelReviewsQuery, useCreateReviewMutation } from '../features/A
 import Navbar from '../Components/Navbar';
 import { 
   MapPin, ShieldCheck, Loader2, CheckCircle2, DoorOpen, 
-  Search, ChevronLeft, ChevronRight, LayoutGrid, Users, Hash, Info, Star,
+  Search, ChevronLeft, ChevronRight, LayoutGrid, Users, Hash, Share2,Mail , Star,
   ArrowRight, Phone, CreditCard, MessageSquare, Quote, UserCircle, X, Send, Plus,
   ChevronDown // Added for dropdown
 } from 'lucide-react';
@@ -42,8 +42,9 @@ const HostelDetailsPage: React.FC = () => {
 
 // 1. AT THE TOP OF YOUR COMPONENT (Outside any functions)
 const { user } = useSelector((state: RootState) => state.auth);
+const studentName = user?.username ||  "a student";
 
-// 2. YOUR UPDATED HANDLER
+// --- WhatsApp Reservation ---
 const handleReservation = () => {
   if (!selectedRoom) return toast.error("Please select a room first! 🏢");
   
@@ -52,12 +53,9 @@ const handleReservation = () => {
     return toast.error("Hostel owner hasn't provided a WhatsApp number. 📲");
   }
 
-  // Use the user's name from the top-level selector, with a fallback
-  const studentName = user?.username || "a student";
-  
   const message = `🌟 *NEW RESERVATION INQUIRY*
 
-Hello, my name is *${studentName}*. I found your property, *${hostel?.name}*, on Unihaven.
+Hello, my name is *${studentName}*. I found your property, *${hostel?.name}*, on Unihaven Hostel Finder.
 
 I am interested in reserving the following unit:
 ━━━━━━━━━━━━━━━━━━
@@ -72,29 +70,62 @@ Is this unit still available for booking? I'd appreciate more details on the nex
 
 Thank you!`;
 
-  // Clean the number: remove '+' and any spaces
   const cleanNumber = whatsappNumber.replace(/\D/g, ''); 
   const encodedMessage = encodeURIComponent(message);
-  const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodedMessage}`;
-  
-  window.open(whatsappUrl, '_blank');
+  window.open(`https://wa.me/${cleanNumber}?text=${encodedMessage}`, '_blank');
 };
 
-// --- CALL MANAGER HANDLER ---
+// --- Call Manager ---
 const handleCallManager = () => {
   const owner = hostel?.owner;
-  
-  if (!owner || !owner.phone) {
-    console.error("Owner data missing in Redux:", hostel);
+  if (!owner?.phone) {
     return toast.error("Contact details for this manager are not available yet. 📞");
   }
 
-  // Ensure we remove any spaces or '+' if necessary, though wa.me and tel: 
-  // are usually fine with international format
   const cleanPhone = owner.phone.replace(/\s+/g, '');
-  
-  toast.success(`Calling ${owner.fullName}...`);
+  toast.success(`Dialing ${owner.fullName}...`);
   window.open(`tel:${cleanPhone}`);
+};
+
+// --- Email Inquiry ---
+const handleEmailInquiry = () => {
+  if (!selectedRoom) return toast.error("Select a room to inquire via email! 📧");
+  
+  const ownerEmail = hostel?.owner?.email;
+  if (!ownerEmail) return toast.error("Owner email address not found. 📩");
+
+  const subject = encodeURIComponent(`Booking Inquiry: ${hostel?.name} - ${selectedRoom.label}`);
+  const body = encodeURIComponent(
+    `Hello ${hostel?.owner?.fullName || 'Manager'},\n\n` +
+    `My name is ${studentName}. I am inquiring about the availability of ${selectedRoom.label} at ${hostel?.name}.\n\n` +
+    `Unit Details:\n` +
+    `- Type: ${selectedRoom.type}\n` +
+    `- Price: KES ${parseFloat(selectedRoom.price).toLocaleString()} / ${selectedRoom.billingCycle}\n\n` +
+    `Please let me know the requirements for securing this unit.\n\n` +
+    `Best regards,\n${studentName}\nSent via Unihaven.`
+  );
+
+  window.location.href = `mailto:${ownerEmail}?subject=${subject}&body=${body}`;
+};
+
+// --- Smart Share ---
+const handleShareHostel = async () => {
+  const shareData = {
+    title: `Check out ${hostel?.name}`,
+    text: `Hey! Look at this hostel I found on Unihaven: ${hostel?.name} at ${hostel?.campus}.`,
+    url: window.location.href,
+  };
+
+  try {
+    if (navigator.share) {
+      await navigator.share(shareData);
+    } else {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success("Link copied to clipboard! 📋");
+    }
+  } catch (err) {
+    console.error("Share failed:", err);
+  }
 };
 
   // --- REVIEW SUBMISSION HANDLER ---
@@ -227,7 +258,8 @@ const handleCallManager = () => {
                     <span className="text-sm font-medium">{hostel.address}</span>
                 </div>
                 <div className="flex items-center gap-2 bg-amber-500/10 px-4 py-1.5 rounded-full border border-amber-500/20">
-                    <Star size={14} className="text-amber-400 fill-amber-400" />
+               
+  const body = encodeURIComponent(     <Star size={14} className="text-amber-400 fill-amber-400" />
                     <span className="text-[12px] font-black text-amber-300">{reviewData?.stats.averageRating || "0.0"}</span>
                     <span className="text-[8px] font-bold text-amber-600 uppercase tracking-widest ml-1">({reviewData?.stats.totalReviews} Reviews)</span>
                 </div>
@@ -416,81 +448,111 @@ const handleCallManager = () => {
         </div>
 
         {/* SIDEBAR BOOKING CARD */}
-        <div className="lg:col-span-1">
-          <div className="sticky top-32 p-8 bg-[#6366F1] rounded-[3.5rem] shadow-2xl text-white overflow-hidden group transition-all duration-700">
-            <div className="relative z-10">
-              <div className="flex justify-between items-start mb-6">
-                <div className="bg-white/10 px-4 py-1.5 rounded-full border border-white/20">
-                   <p className="text-[9px] font-black uppercase tracking-widest">
-                    {selectedRoom ? "Live Inventory" : "Pricing Guide"}
-                   </p>
-                </div>
-                <Info size={18} className="opacity-40" />
-              </div>
-              
-              <div className="flex items-baseline gap-2 mb-8">
-                <span className="text-4xl md:text-5xl font-black italic tracking-tighter">
-                  KES {parseFloat(selectedRoom ? selectedRoom.price : roomMetrics.minPrice).toLocaleString()}
-                </span>
-                <span className="text-sm font-bold opacity-60 uppercase">{selectedRoom?.billingCycle || 'Starting'}</span>
-              </div>
+<div className="lg:col-span-1">
+  <div className="sticky top-32 p-8 bg-[#6366F1] rounded-[3.5rem] shadow-2xl text-white overflow-hidden group transition-all duration-700">
+    <div className="relative z-10">
+      <div className="flex justify-between items-start mb-6">
+        <div className="bg-white/10 px-4 py-1.5 rounded-full border border-white/20">
+          <p className="text-[9px] font-black uppercase tracking-widest">
+            {selectedRoom ? "Live Inventory" : "Pricing Guide"}
+          </p>
+        </div>
+        <button 
+          onClick={handleShareHostel}
+          className="bg-white/10 p-2 rounded-full hover:bg-white/20 transition-colors border border-white/10"
+          title="Share Hostel"
+        >
+          <Share2 size={16} />
+        </button>
+      </div>
+      
+      <div className="flex items-baseline gap-2 mb-8">
+        <span className="text-4xl md:text-5xl font-black italic tracking-tighter">
+          KES {parseFloat(selectedRoom ? selectedRoom.price : roomMetrics.minPrice).toLocaleString()}
+        </span>
+        <span className="text-sm font-bold opacity-60 uppercase">{selectedRoom?.billingCycle || 'Starting'}</span>
+      </div>
 
-              {selectedRoom ? (
-                <div className="space-y-4 mb-8">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-white/10 p-4 rounded-3xl border border-white/10">
-                      <div className="flex items-center gap-2 opacity-60 mb-1">
-                        <Hash size={12} />
-                        <span className="text-[8px] font-black uppercase">Room Label</span>
-                      </div>
-                      <p className="text-sm font-black italic">{selectedRoom.label}</p>
-                    </div>
-                    <div className="bg-white/10 p-4 rounded-3xl border border-white/10">
-                      <div className="flex items-center gap-2 opacity-60 mb-1">
-                        <Users size={12} />
-                        <span className="text-[8px] font-black uppercase">Occupancy</span>
-                      </div>
-                      <p className="text-sm font-black italic">{selectedRoom.totalSlots} Slots</p>
-                    </div>
-                  </div>
-                  <div className="bg-slate-950/20 p-4 rounded-3xl border border-white/10 flex items-center justify-between">
-                    <div>
-                      <p className="text-[8px] font-black uppercase opacity-60">Configuration</p>
-                      <p className="text-xs font-black italic uppercase tracking-wider">{selectedRoom.type} • {selectedRoom.floor}</p>
-                    </div>
-                    <CheckCircle2 className="text-indigo-200" size={20} />
-                  </div>
-                </div>
-              ) : (
-                <div className="py-12 flex flex-col items-center justify-center border-2 border-dashed border-white/20 rounded-[2.5rem] mb-8 bg-white/5">
-                   <DoorOpen size={32} className="opacity-20 mb-3" />
-                   <p className="text-[10px] font-black uppercase opacity-40 text-center px-8 tracking-widest leading-relaxed">Select a specific unit from the browser to confirm availability</p>
-                </div>
-              )}
-
-              <div className="space-y-4">
-                <button 
-                  onClick={handleReservation}
-                  className={`w-full font-black py-6 rounded-[2rem] uppercase text-[11px] tracking-widest flex items-center justify-center gap-3 transition-all ${
-                  selectedRoom ? 'bg-white text-[#6366F1] hover:scale-[1.02] shadow-xl' : 'bg-white/10 text-white/30 cursor-not-allowed border border-white/5'
-                }`}>
-                  {selectedRoom ? 'Finalize Reservation' : 'Choose Your Unit'} <ArrowRight size={18} />
-                </button>
-                <button 
-                  onClick={handleCallManager}
-                  className="w-full bg-slate-950/20 border border-white/20 text-white font-black py-5 rounded-[2rem] uppercase text-[10px] tracking-widest flex items-center justify-center gap-3 hover:bg-white/10 transition-all"
-                >
-                  <Phone size={16} /> Contact Manager
-                </button>
+      {selectedRoom ? (
+        <div className="space-y-4 mb-8">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-white/10 p-4 rounded-3xl border border-white/10">
+              <div className="flex items-center gap-2 opacity-60 mb-1">
+                <Hash size={12} />
+                <span className="text-[8px] font-black uppercase">Room Label</span>
               </div>
-
-              <div className="mt-8 flex items-center justify-center gap-4 opacity-40">
-                <CreditCard size={14} />
-                <span className="text-[8px] font-black uppercase tracking-[0.2em]">Secure Payment via M-Pesa / Bank</span>
+              <p className="text-sm font-black italic">{selectedRoom.label}</p>
+            </div>
+            <div className="bg-white/10 p-4 rounded-3xl border border-white/10">
+              <div className="flex items-center gap-2 opacity-60 mb-1">
+                <Users size={12} />
+                <span className="text-[8px] font-black uppercase">Occupancy</span>
               </div>
+              <p className="text-sm font-black italic">{selectedRoom.totalSlots} Slots</p>
             </div>
           </div>
+          <div className="bg-slate-950/20 p-4 rounded-3xl border border-white/10 flex items-center justify-between">
+            <div>
+              <p className="text-[8px] font-black uppercase opacity-60">Configuration</p>
+              <p className="text-xs font-black italic uppercase tracking-wider">{selectedRoom.type} • {selectedRoom.floor}</p>
+            </div>
+            <CheckCircle2 className="text-indigo-200" size={20} />
+          </div>
         </div>
+      ) : (
+        <div className="py-12 flex flex-col items-center justify-center border-2 border-dashed border-white/20 rounded-[2.5rem] mb-8 bg-white/5">
+           <DoorOpen size={32} className="opacity-20 mb-3" />
+           <p className="text-[10px] font-black uppercase opacity-40 text-center px-8 tracking-widest leading-relaxed">Select a specific unit from the browser to confirm availability</p>
+        </div>
+      )}
+
+      <div className="space-y-3">
+        {/* PRIMARY ACTION: WHATSAPP */}
+        <button 
+          onClick={handleReservation}
+          disabled={!selectedRoom}
+          className={`w-full font-black py-6 rounded-[2rem] uppercase text-[11px] tracking-widest flex items-center justify-center gap-3 transition-all duration-300 shadow-xl ${
+          selectedRoom 
+            ? 'bg-white text-[#6366F1] hover:scale-[1.02] active:scale-95' 
+            : 'bg-white/10 text-white/30 cursor-not-allowed border border-white/5'
+        }`}>
+          {selectedRoom ? 'Reserve via WhatsApp' : 'Choose Your Unit'} <ArrowRight size={18} />
+        </button>
+
+        {/* SECONDARY ACTIONS ROW */}
+        <div className="grid grid-cols-2 gap-3">
+          <button 
+            onClick={handleCallManager}
+            className="bg-slate-950/20 border border-white/20 text-white font-black py-4 rounded-3xl uppercase text-[9px] tracking-widest flex items-center justify-center gap-2 hover:bg-white/10 transition-all active:scale-95"
+          >
+            <Phone size={14} /> Call
+          </button>
+          <button 
+            onClick={handleEmailInquiry}
+            className="bg-slate-950/20 border border-white/20 text-white font-black py-4 rounded-3xl uppercase text-[9px] tracking-widest flex items-center justify-center gap-2 hover:bg-white/10 transition-all active:scale-95"
+          >
+            <Mail size={14} /> Email
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-8 flex flex-col items-center gap-4">
+        <div className="flex items-center gap-3 opacity-40">
+           <CreditCard size={14} />
+           <span className="text-[8px] font-black uppercase tracking-[0.2em]">Secure Payments Supported</span>
+        </div>
+        
+        {/* M-PESA LOGO PLACEHOLDER / TEXT */}
+        <div className="bg-white/5 px-4 py-2 rounded-2xl border border-white/5 w-full flex justify-center">
+            <p className="text-[7px] font-black uppercase opacity-30 tracking-[0.3em]">M-PESA • VISA • MASTERCARD • BANK</p>
+        </div>
+      </div>
+    </div>
+    
+    {/* COOL BACKGROUND DECORATION */}
+    <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
+  </div>
+</div>
       </main>
 
       {/* --- MODAL: ALL REVIEWS --- */}
