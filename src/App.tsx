@@ -23,6 +23,9 @@ import NotFound from "./Pages/NotFound";
 import SearchByAddress from "./Pages/SearchByAddress";
 import CampusHub from "./Pages/CampusMap";
 import About from "./Pages/About";
+import SafetyTrust from "./Pages/Saftey";
+import FAQ from "./Pages/Faq";
+import Contact from "./Pages/Contact";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -78,6 +81,18 @@ const App = () => {
     {
       path: '/about',
       element: <About />
+    },
+      {
+      path: '/safety',
+      element: <SafetyTrust />
+    },
+      {
+      path: '/faq',
+      element: <FAQ />
+    },
+    {
+      path: '/contact',
+      element: <Contact />
     },
     {
       path: '/admin-dashboard',

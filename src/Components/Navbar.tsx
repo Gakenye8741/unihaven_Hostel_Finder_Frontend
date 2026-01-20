@@ -5,16 +5,20 @@ import toast from "react-hot-toast";
 import { 
   LogOut, User, ChevronDown, 
   LayoutDashboard, X, Home, Search, 
-  Building2, Map, Info, PlusCircle 
+  Building2, Map, Info, PlusCircle,
+  ShieldCheck, HelpCircle, MessageSquare, MoreHorizontal 
 } from "lucide-react";
 import type { RootState } from "../App/store";
 import { clearCredentials } from "../features/Auth/Auth.slice";
 
 const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
+  const [infoDropdownOpen, setInfoDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const infoMenuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -29,6 +33,16 @@ const Navbar: React.FC = () => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (infoMenuRef.current && !infoMenuRef.current.contains(event.target as Node)) {
+        setInfoDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleLogout = () => {
@@ -72,7 +86,6 @@ const Navbar: React.FC = () => {
       : "text-amber-500/70 border-transparent hover:text-amber-400"
     }`;
 
-  // Style for the mobile bottom bar icons
   const activeMobileBottomStyle = ({ isActive }: { isActive: boolean }) => 
     `flex flex-col items-center justify-center flex-1 transition-all duration-300 ${
       isActive ? "text-[#6366F1]" : "text-slate-500"
@@ -80,7 +93,6 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      {/* TOP NAVBAR */}
       <nav className={`fixed top-0 left-0 w-full z-[100] transition-all duration-500 border-b ${
         scrolled 
         ? "bg-[#0F172A]/95 backdrop-blur-md border-indigo-500/30 shadow-2xl py-0" 
@@ -89,6 +101,7 @@ const Navbar: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20 items-center">
             
+            {/* LOGO */}
             <Link to="/" className="flex items-center flex-shrink-0 group">
               <div className="relative h-10 w-10 sm:h-11 sm:w-11 mr-3 flex items-center justify-center rounded-xl border border-indigo-500/30 bg-indigo-500/10 transition-all group-hover:bg-indigo-500/20">
                 <Building2 className="text-[#6366F1] group-hover:scale-110 transition-transform" size={24} />
@@ -99,21 +112,58 @@ const Navbar: React.FC = () => {
               </div>
             </Link>
 
-            {/* DESKTOP NAV (Hidden on mobile) */}
-            <div className="hidden lg:flex space-x-8 items-center text-[10px] uppercase tracking-[0.2em] font-bold">
+            {/* DESKTOP NAV - ARRANGED & PRESENTABLE */}
+            <div className="hidden lg:flex space-x-10 items-center text-[10px] uppercase tracking-[0.2em] font-bold">
               <NavLink to="/" end className={activeStyle}><Home size={13} className="mr-1.5" /> Home</NavLink>
               <NavLink to="/hostels" className={activeStyle}><Search size={13} className="mr-1.5" /> Find Hostel</NavLink>
+              <NavLink to="/map" className={activeStyle}><Map size={13} className="mr-1.5" /> Campus Map</NavLink>
               
               {showApplyTab && (
                 <NavLink to="/ApplyHostelOwner" className={applyTabStyle}>
-                  <PlusCircle size={13} className="mr-1.5" /> Apply to List
+                  <PlusCircle size={13} className="mr-1.5" /> Apply
                 </NavLink>
               )}
 
-              <NavLink to="/map" className={activeStyle}><Map size={13} className="mr-1.5" /> Campus Map</NavLink>
-              <NavLink to="/about" className={activeStyle}><Info size={13} className="mr-1.5" /> About</NavLink>
+              {/* RESOURCES DROPDOWN (Safety, FAQ, Contact) */}
+              <div className="relative" ref={infoMenuRef}>
+                <button 
+                  onMouseEnter={() => setInfoDropdownOpen(true)}
+                  className="flex items-center text-slate-400 hover:text-[#6366F1] transition-all py-2"
+                >
+                  Resources <ChevronDown size={10} className={`ml-1 transition-transform ${infoDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {infoDropdownOpen && (
+                  <div 
+                    onMouseLeave={() => setInfoDropdownOpen(false)}
+                    className="absolute top-full -left-4 w-48 bg-[#1E293B] border border-white/10 shadow-2xl py-2 rounded-xl animate-in fade-in zoom-in-95 duration-150"
+                  >
+                    <NavLink to="/safety" className="flex items-center px-4 py-3 text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
+                      <ShieldCheck size={14} className="mr-3 text-emerald-500" /> Safety Guide
+                    </NavLink>
+                    <NavLink to="/faq" className="flex items-center px-4 py-3 text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
+                      <HelpCircle size={14} className="mr-3 text-indigo-500" /> Help Center
+                    </NavLink>
+                    <NavLink to="/contact" className="flex items-center px-4 py-3 text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
+                      <MessageSquare size={14} className="mr-3 text-indigo-500" /> Contact Support
+                    </NavLink>
+                  </div>
+                )}
+              </div>
+
+              {/* MAJOR BUTTON: ABOUT */}
+              <NavLink to="/about" className={({ isActive }) => `
+                flex items-center px-5 py-2.5 rounded-full border-2 transition-all duration-300 
+                ${isActive 
+                  ? "bg-white text-[#0F172A] border-white font-black" 
+                  : "bg-transparent text-white border-white/20 hover:border-white/60 hover:bg-white/5"
+                }
+              `}>
+                <Info size={13} className="mr-2" /> About UniHaven
+              </NavLink>
             </div>
 
+            {/* PROFILE ACCESS */}
             <div className="flex items-center space-x-4">
               <div className="relative" ref={dropdownRef}>
                 <button 
@@ -162,33 +212,38 @@ const Navbar: React.FC = () => {
         </div>
       </nav>
 
-      {/* MOBILE BOTTOM NAVIGATION (Visible only on small screens) */}
-      <div className="lg:hidden fixed bottom-0 left-0 w-full bg-[#0F172A]/90 backdrop-blur-xl border-t border-slate-800 z-[100] px-4 pb-2">
+      {/* MOBILE BOTTOM NAVIGATION */}
+      <div className="lg:hidden fixed bottom-0 left-0 w-full bg-[#0F172A]/95 backdrop-blur-xl border-t border-slate-800 z-[100] px-4 pb-2">
+        {mobileMoreOpen && (
+          <div className="absolute bottom-20 right-4 w-48 bg-[#1E293B] border border-white/10 shadow-2xl rounded-2xl p-2 animate-in slide-in-from-bottom-5">
+            <NavLink to="/safety" className="flex items-center p-3 text-[10px] uppercase tracking-widest text-slate-300 border-b border-white/5" onClick={() => setMobileMoreOpen(false)}>
+              <ShieldCheck size={14} className="mr-3 text-emerald-500" /> Safety
+            </NavLink>
+            <NavLink to="/faq" className="flex items-center p-3 text-[10px] uppercase tracking-widest text-slate-300 border-b border-white/5" onClick={() => setMobileMoreOpen(false)}>
+              <HelpCircle size={14} className="mr-3 text-indigo-500" /> FAQ
+            </NavLink>
+            <NavLink to="/contact" className="flex items-center p-3 text-[10px] uppercase tracking-widest text-slate-300 border-b border-white/5" onClick={() => setMobileMoreOpen(false)}>
+              <MessageSquare size={14} className="mr-3 text-indigo-500" /> Contact
+            </NavLink>
+            <NavLink to="/about" className="flex items-center p-3 text-[10px] uppercase tracking-widest text-slate-300" onClick={() => setMobileMoreOpen(false)}>
+              <Info size={14} className="mr-3 text-indigo-500" /> About
+            </NavLink>
+          </div>
+        )}
+
         <div className="flex justify-between h-16 items-center">
-          <NavLink to="/" end className={activeMobileBottomStyle}>
-            <Home size={20} />
-            <span className="text-[8px] uppercase mt-1 font-bold">Home</span>
-          </NavLink>
-          <NavLink to="/hostels" className={activeMobileBottomStyle}>
-            <Search size={20} />
-            <span className="text-[8px] uppercase mt-1 font-bold">Find</span>
-          </NavLink>
+          <NavLink to="/" end className={activeMobileBottomStyle}><Home size={20} /><span className="text-[8px] uppercase mt-1 font-bold">Home</span></NavLink>
+          <NavLink to="/hostels" className={activeMobileBottomStyle}><Search size={20} /><span className="text-[8px] uppercase mt-1 font-bold">Find</span></NavLink>
           {showApplyTab && (
             <NavLink to="/ApplyHostelOwner" className={activeMobileBottomStyle}>
-              <div className="bg-amber-500 p-2 rounded-full -mt-8 shadow-lg shadow-amber-500/20 text-[#0F172A]">
-                <PlusCircle size={24} />
-              </div>
+              <div className="bg-amber-500 p-2 rounded-full -mt-8 shadow-lg shadow-amber-500/20 text-[#0F172A]"><PlusCircle size={24} /></div>
               <span className="text-[8px] uppercase mt-1 font-bold text-amber-500">Apply</span>
             </NavLink>
           )}
-          <NavLink to="/map" className={activeMobileBottomStyle}>
-            <Map size={20} />
-            <span className="text-[8px] uppercase mt-1 font-bold">Map</span>
-          </NavLink>
-          <NavLink to="/about" className={activeMobileBottomStyle}>
-            <Info size={20} />
-            <span className="text-[8px] uppercase mt-1 font-bold">About</span>
-          </NavLink>
+          <NavLink to="/map" className={activeMobileBottomStyle}><Map size={20} /><span className="text-[8px] uppercase mt-1 font-bold">Map</span></NavLink>
+          <button onClick={() => setMobileMoreOpen(!mobileMoreOpen)} className={`flex flex-col items-center justify-center flex-1 transition-all duration-300 ${mobileMoreOpen ? "text-[#6366F1]" : "text-slate-500"}`}>
+            <MoreHorizontal size={20} /><span className="text-[8px] uppercase mt-1 font-bold">More</span>
+          </button>
         </div>
       </div>
     </>
