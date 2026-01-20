@@ -45,6 +45,11 @@ const CampusHub: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCampus, setSelectedCampus] = useState<string | null>(null);
 
+  // Helper to capitalize campus names for cleaner URLs (e.g., "LAIKIPIA" -> "Laikipia")
+  const formatNameForUrl = (str: string) => {
+    return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  };
+
   const campusRegistry = useMemo(() => {
     const registry: Record<string, { count: number; fullName: string; isSystem: boolean }> = {};
     Object.keys(campusAliases).forEach(short => {
@@ -97,7 +102,6 @@ const CampusHub: React.FC = () => {
             </div>
           </div>
 
-          {/* Added padding at bottom (pb-32) so last item is not hidden by mobile navbar */}
           <div className="flex-grow overflow-y-auto no-scrollbar px-6 pb-32 lg:pb-10 space-y-3">
             {filteredList.map((name) => (
               <button
@@ -137,7 +141,6 @@ const CampusHub: React.FC = () => {
               />
               
               {/* STICKY BOTTOM ACTION AREA - FIXED FOR MOBILE NAVBAR */}
-              {/* Added bottom-20 for mobile and bottom-10 for desktop */}
               <div className="absolute bottom-20 lg:bottom-10 left-0 right-0 px-4 lg:px-10 z-20 flex flex-col gap-3">
                 <div className="flex flex-col lg:flex-row gap-3 w-full max-w-5xl mx-auto">
                   
@@ -156,10 +159,10 @@ const CampusHub: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Primary Action Button - Now clearly visible above Bottom Nav */}
+                  {/* FIXED LINK: Now points to /campus/Campus%20Name */}
                   {campusRegistry[selectedCampus]?.count > 0 ? (
                     <Link 
-                      to={`/hostels?campus=${encodeURIComponent(selectedCampus)}`} 
+                      to={`/campus/${encodeURIComponent(formatNameForUrl(selectedCampus))}`} 
                       className="bg-white text-black h-12 lg:h-auto px-6 lg:px-10 py-4 lg:py-6 rounded-2xl lg:rounded-[2.5rem] flex items-center justify-center gap-3 font-black uppercase text-[10px] lg:text-[12px] tracking-widest hover:bg-indigo-600 hover:text-white transition-all shadow-2xl"
                     >
                       View Hostels <ArrowRight size={16} />

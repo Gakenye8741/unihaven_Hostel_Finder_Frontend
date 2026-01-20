@@ -19,16 +19,17 @@ import RegisterPage from "./Pages/RegisterPage";
 import VerifyEmail from "./Pages/Verify-Email";
 import ApplyOwnerPage from "./Pages/ApplyHostelOwner";
 import AdminVerificationPanel from "./DashBoards/Admin-Dashboard/AdminVerificationPanel";
-import NotFound from "./Pages/NotFound"; // Import your new 404 page
+import NotFound from "./Pages/NotFound"; 
 import SearchByAddress from "./Pages/SearchByAddress";
 import CampusHub from "./Pages/CampusMap";
+import About from "./Pages/About";
 
 const App = () => {
   const router = createBrowserRouter([
     {
       path: '/',
       element: <Home />,
-      errorElement: <NotFound />, // Catch crashes/errors at the root level
+      errorElement: <NotFound />,
     },
     {
       path: '/login',
@@ -73,6 +74,10 @@ const App = () => {
     {
       path: '/map',
       element: <CampusHub />
+    },
+    {
+      path: '/about',
+      element: <About />
     },
     {
       path: '/admin-dashboard',
