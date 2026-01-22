@@ -11,7 +11,8 @@ import {
   Wifi,
   Users,
   HardHat,
-  MessageCircle
+  MessageCircle,
+  Workflow
 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { clearCredentials } from "../../../features/Auth/Auth.slice";
@@ -26,7 +27,7 @@ const navItems = [
   { name: "Review Manager", path: "reviews", icon: <MessageCircle  className="text-lime-500" size={18} /> },
   { name: "Maintenance", path: "maintenance", icon: <HardHat className="text-yellow-400" size={18} /> },
   { name: "My Profile", path: "profile", icon: <User className="text-purple-400" size={18} /> },
-  { name: "Settings", path: "settings", icon: <Settings className="text-teal-400" size={18} /> },
+  { name: "Staff Manager", path: "staffs", icon: <Workflow className="text-teal-400" size={18} /> },
   { name: "Logout", path: "#", icon: <LogOut className="text-red-500" size={18} /> },
 ];
 

@@ -26,7 +26,7 @@ export const usersApi = createApi({
       providesTags: (result, error, id) => [{ type: 'User', id }],
     }),
 
-   updateMyProfile: builder.mutation({
+    updateMyProfile: builder.mutation({
       query: (updateBody) => ({
         url: 'users/update-me',
         method: 'PATCH',
@@ -70,17 +70,17 @@ export const usersApi = createApi({
     /**
      * Admin Update Specific User Details
      */
-   adminUpdateUser: builder.mutation({
-  query: ({ id, ...updateBody }) => ({
-    url: `users/admin/update-user/${id}`, // <--- This targets the specific user
-    method: 'PATCH',
-    body: updateBody,
-  }),
-  invalidatesTags: (result, error, { id }) => [
-    { type: 'User', id }, 
-    { type: 'User', id: 'LIST' }
-  ],
-}),
+    adminUpdateUser: builder.mutation({
+      query: ({ id, ...updateBody }) => ({
+        url: `users/admin/update-user/${id}`, 
+        method: 'PATCH',
+        body: updateBody,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'User', id }, 
+        { type: 'User', id: 'LIST' }
+      ],
+    }),
 
     /**
      * Admin Delete User
@@ -90,7 +90,6 @@ export const usersApi = createApi({
         url: `users/admin/delete/${id}`,
         method: 'DELETE',
       }),
-      // FIX: Ensure list is cleared on delete
       invalidatesTags: (result, error, id) => [
         { type: 'User', id },
         { type: 'User', id: 'LIST' },
@@ -124,20 +123,21 @@ export const usersApi = createApi({
      */
     updateAccountStatus: builder.mutation({
       query: ({ userId, status }) => ({
-        // Added 'users/' prefix and ensure userId is used
         url: `users/admin/account-status/${userId}`, 
         method: 'PATCH',
         body: { status },
       }),
-      // Changed 'Users' tag to 'User' to match your tagTypes definition
       invalidatesTags: (result, error, { userId }) => [
         { type: 'User', id: userId }, 
         { type: 'User', id: 'LIST' }
       ],
     }),
 
+    /**
+     * Admin Get All Users
+     */
     getAllUsers: builder.query({
-      query: () => 'users/admin/all-users',
+      query: () => 'users/all-users',
       providesTags: (result) => 
         result 
           ? [

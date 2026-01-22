@@ -8,16 +8,15 @@ import {
   useDeleteUserMutation 
 } from '../../features/Apis/Users.Api'; 
 import { 
-  User, Loader2, Shield, X, UserX,
-  Fingerprint, UserCog, Phone, Search, CreditCard, Info, Eye,
-  ShieldAlert, ShieldCheck, Ban, FileText, AlertCircle, Clock, Trash2,
-  Users, Activity, ShieldCheck as ShieldIcon, Image as ImageIcon, ExternalLink, FileWarning
+  User, Loader2, X, UserX, UserCog, Search, ExternalLink, 
+  ShieldAlert, ShieldCheck, Ban, AlertCircle, Clock, Trash2,
+  Activity, Image as ImageIcon, FileWarning, AtSign
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const UserManager: React.FC = () => {
-  // --- API HOOKS ---
-  const { data: users, isLoading } = useGetAllUsersQuery({});
+  // --- API HOOKS (Using your provided API) ---
+  const { data: users, isLoading, isError } = useGetAllUsersQuery({});
   const { data: stats } = useGetSystemUserStatsQuery({});
   const [adminUpdateUser, { isLoading: isUpdating }] = useAdminUpdateUserMutation();
   const [verifyIdentity, { isLoading: isVerifying }] = useVerifyUserIdentityMutation();
@@ -67,10 +66,8 @@ const UserManager: React.FC = () => {
 
   const handleStatusUpdate = async (newStatus: string) => {
     const targetId = selectedUser?.id || selectedUser?._id;
-    if (!targetId) {
-      toast.error("IDENTITY ERROR: Invalid Node Reference");
-      return;
-    }
+    if (!targetId) return toast.error("IDENTITY ERROR: Invalid Node Reference");
+    
     try {
       await updateAccountStatus({ userId: targetId, status: newStatus }).unwrap();
       toast.success(`Protocol Updated: Identity is now ${newStatus}`);
@@ -83,7 +80,6 @@ const UserManager: React.FC = () => {
   const handleDeleteUser = async () => {
     const targetId = selectedUser?.id || selectedUser?._id;
     if (!targetId) return;
-
     try {
       await deleteUser(targetId).unwrap();
       toast.success("Identity successfully purged from system");
@@ -120,6 +116,7 @@ const UserManager: React.FC = () => {
     }
   };
 
+  // Filter users based on your list
   const filteredUsers = users?.filter((u: any) => 
     u.username?.toLowerCase().includes(searchTerm.toLowerCase()) || 
     u.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -160,7 +157,7 @@ const UserManager: React.FC = () => {
     <div className="min-h-screen bg-[#030712] text-slate-300 p-4 md:p-6 selection:bg-indigo-500/30">
       <div className="max-w-7xl mx-auto">
         
-        {/* STATS OVERVIEW */}
+        {/* STATS OVERVIEW (Using your Stats endpoint) */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {stats?.map((stat: any, index: number) => (
             <div key={index} className="bg-[#0F172A] border border-slate-800 p-4 rounded-2xl flex flex-col gap-1">
@@ -190,11 +187,12 @@ const UserManager: React.FC = () => {
                placeholder="Search by name, email or handle..." 
                value={searchTerm} 
                onChange={(e) => setSearchTerm(e.target.value)} 
-               className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3.5 pl-11 pr-4 text-xs outline-none focus:border-indigo-500/50 transition-all" 
+               className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3.5 pl-11 pr-4 text-xs outline-none focus:border-indigo-500/50 transition-all text-white" 
             />
           </div>
         </header>
 
+        {/* --- MAIN USER TABLE --- */}
         <div className="bg-[#0F172A] border border-slate-800 rounded-3xl overflow-hidden shadow-2xl relative">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
@@ -263,7 +261,7 @@ const UserManager: React.FC = () => {
         </div>
       </div>
 
-      {/* SIDE PANEL (DRAWER) */}
+      {/* --- SIDE PANEL (EDIT/VERIFY/SECURITY) --- */}
       {isPanelOpen && (
         <div className="fixed inset-0 z-[1000] flex justify-end">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onClick={() => setIsPanelOpen(false)} />
@@ -367,12 +365,11 @@ const UserManager: React.FC = () => {
               )}
 
               {activeTab === 'security' && (
-                <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-400">
+                <div className="space-y-6">
                   <div className="p-8 bg-slate-950 border border-white/5 rounded-[2.5rem] text-center space-y-4">
                     <div className={`w-20 h-20 rounded-3xl flex items-center justify-center mx-auto border transition-colors ${
                       selectedUser?.accountStatus === 'ACTIVE' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
                       selectedUser?.accountStatus === 'SUSPENDED' ? 'bg-amber-500/10 border-amber-500/20 text-amber-500' :
-                      selectedUser?.accountStatus === 'DEACTIVATED' ? 'bg-slate-500/10 border-slate-500/20 text-slate-500' :
                       'bg-rose-500/10 border-rose-500/20 text-rose-500'
                     }`}>
                       <ShieldAlert size={40} />
@@ -389,55 +386,26 @@ const UserManager: React.FC = () => {
                         key={status}
                         disabled={isStatusChanging || selectedUser?.accountStatus === status} 
                         onClick={() => handleStatusUpdate(status)}
-                        className={`w-full p-5 bg-slate-950 border border-white/5 rounded-2xl flex items-center justify-between group transition-all disabled:opacity-30 ${
-                          status === 'ACTIVE' ? 'hover:border-emerald-500/40' : 
-                          status === 'SUSPENDED' ? 'hover:border-amber-500/40' : 
-                          status === 'DEACTIVATED' ? 'hover:border-slate-500/40' :
-                          'hover:border-rose-500/40'
-                        }`}
+                        className="w-full p-5 bg-slate-950 border border-white/5 rounded-2xl flex items-center justify-between group transition-all"
                       >
-                        <div className="flex items-center gap-4 text-left">
-                          <div className={`p-2.5 rounded-xl ${
-                             status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-500' : 
-                             status === 'SUSPENDED' ? 'bg-amber-500/10 text-amber-500' : 
-                             status === 'DEACTIVATED' ? 'bg-slate-500/10 text-slate-500' :
-                             'bg-rose-500/10 text-rose-500'
-                          }`}>
-                            {status === 'ACTIVE' ? <ShieldCheck size={18} /> : 
-                             status === 'SUSPENDED' ? <Clock size={18} /> : 
-                             status === 'DEACTIVATED' ? <UserX size={18} /> :
-                             <Ban size={18} />}
+                         <div className="flex items-center gap-4 text-left">
+                          <div className={`p-2.5 rounded-xl ${status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
+                            {status === 'ACTIVE' ? <ShieldCheck size={18} /> : <Ban size={18} />}
                           </div>
-                          <div>
-                            <p className="text-[10px] font-black text-white uppercase tracking-tight">{status}</p>
-                            <p className="text-[8px] text-slate-500 uppercase font-bold">Protocol Overwrite</p>
-                          </div>
+                          <p className="text-[10px] font-black text-white uppercase">{status}</p>
                         </div>
-                        {isStatusChanging ? <Loader2 className="animate-spin" size={14} /> : <div className={`h-2 w-2 rounded-full ${
-                          status === 'ACTIVE' ? 'bg-emerald-500' : 
-                          status === 'SUSPENDED' ? 'bg-amber-500' : 
-                          status === 'DEACTIVATED' ? 'bg-slate-500' :
-                          'bg-rose-500'
-                        }`} />}
+                        {isStatusChanging ? <Loader2 className="animate-spin" size={14} /> : null}
                       </button>
                     ))}
 
-                    <hr className="border-white/5 my-2" />
-
                     <button 
                       onClick={() => setIsDeleteModalOpen(true)}
-                      className="w-full p-5 bg-rose-950/20 border border-rose-500/20 hover:border-rose-500/50 rounded-2xl flex items-center justify-between group transition-all"
+                      className="w-full p-5 bg-rose-950/20 border border-rose-500/20 hover:border-rose-500/50 rounded-2xl flex items-center justify-between transition-all"
                     >
-                      <div className="flex items-center gap-4 text-left">
-                        <div className="p-2.5 bg-rose-500/10 rounded-xl text-rose-500">
-                          <Trash2 size={18} />
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-black text-rose-500 uppercase tracking-tight">Hard Delete Node</p>
-                          <p className="text-[8px] text-rose-500/50 uppercase font-bold">Permanent removal from matrix</p>
-                        </div>
+                      <div className="flex items-center gap-4 text-left text-rose-500">
+                        <Trash2 size={18} />
+                        <p className="text-[10px] font-black uppercase">Hard Delete Node</p>
                       </div>
-                      <ChevronRight size={14} className="text-rose-500/30 group-hover:translate-x-1 transition-transform" />
                     </button>
                   </div>
                 </div>
@@ -446,62 +414,36 @@ const UserManager: React.FC = () => {
 
             <div className="p-8 border-t border-white/5 bg-slate-950/40">
               {activeTab === 'edit' && (
-                <button disabled={isUpdating} onClick={handleSyncUpdate} className="w-full py-4.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all shadow-xl shadow-indigo-600/20">
-                  {isUpdating ? <Loader2 className="animate-spin" size={18} /> : <Fingerprint size={18} />}
-                  Save Identity
+                <button disabled={isUpdating} onClick={handleSyncUpdate} className="w-full py-4.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-indigo-600/20">
+                  {isUpdating ? <Loader2 className="animate-spin" size={18} /> : null} Save Identity
                 </button>
               )}
               {activeTab === 'verify' && (
                 <div className="grid grid-cols-2 gap-4">
-                  <button disabled={isVerifying} onClick={() => handleVerifyPromotion('REJECTED')} className="py-4 bg-rose-600 hover:bg-rose-500 text-white rounded-2xl text-[10px] font-black uppercase transition-all flex items-center justify-center gap-2">
-                    {isVerifying ? <Loader2 className="animate-spin" size={14} /> : null} Reject
-                  </button>
-                  <button disabled={isVerifying} onClick={() => handleVerifyPromotion('APPROVED')} className="py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-[10px] font-black uppercase transition-all flex items-center justify-center gap-2">
-                    {isVerifying ? <Loader2 className="animate-spin" size={14} /> : null} Approve
-                  </button>
+                  <button onClick={() => handleVerifyPromotion('REJECTED')} className="py-4 bg-rose-600 text-white rounded-2xl text-[10px] font-black uppercase">Reject</button>
+                  <button onClick={() => handleVerifyPromotion('APPROVED')} className="py-4 bg-emerald-600 text-white rounded-2xl text-[10px] font-black uppercase">Approve</button>
                 </div>
-              )}
-              {activeTab === 'security' && (
-                <p className="text-[8px] text-center text-slate-600 uppercase font-black tracking-widest leading-relaxed">
-                  System overrides are logged and monitored. <br /> Ensure compliance with portal guidelines.
-                </p>
               )}
             </div>
           </div>
         </div>
       )}
 
-      {/* --- DELETE CONFIRMATION MODAL --- */}
+      {/* --- DELETE MODAL --- */}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/90 backdrop-blur-xl transition-opacity" onClick={() => setIsDeleteModalOpen(false)} />
-          <div className="relative max-w-sm w-full bg-[#0F172A] border border-rose-500/20 rounded-[2.5rem] p-8 shadow-2xl text-center space-y-6 animate-in zoom-in-95 duration-200">
-            <div className="w-20 h-20 bg-rose-500/10 border border-rose-500/20 rounded-3xl flex items-center justify-center mx-auto text-rose-500">
-              <AlertCircle size={40} className="animate-pulse" />
-            </div>
-            
-            <div className="space-y-2">
-              <h2 className="text-xl font-black text-white italic uppercase tracking-tighter">Purge Protocol</h2>
-              <p className="text-[10px] text-slate-400 uppercase leading-relaxed font-bold tracking-wide">
-                You are about to permanently remove <span className="text-rose-500">@{selectedUser?.username}</span> from the system matrix. This action cannot be undone.
-              </p>
-            </div>
-
+          <div className="absolute inset-0 bg-black/90 backdrop-blur-xl" onClick={() => setIsDeleteModalOpen(false)} />
+          <div className="relative max-w-sm w-full bg-[#0F172A] border border-rose-500/20 rounded-[2.5rem] p-8 text-center space-y-6">
+            <AlertCircle size={40} className="text-rose-500 mx-auto animate-pulse" />
+            <h2 className="text-xl font-black text-white italic uppercase tracking-tighter">Purge Protocol</h2>
+            <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wide">
+              Permanent removal of <span className="text-rose-500">@{selectedUser?.username}</span> from the system. This cannot be undone.
+            </p>
             <div className="flex flex-col gap-3 pt-2">
-              <button 
-                disabled={isDeleting}
-                onClick={handleDeleteUser}
-                className="w-full py-4 bg-rose-600 hover:bg-rose-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all"
-              >
-                {isDeleting ? <Loader2 className="animate-spin" size={18} /> : <Trash2 size={18} />}
-                Confirm Deletion
+              <button disabled={isDeleting} onClick={handleDeleteUser} className="w-full py-4 bg-rose-600 text-white rounded-2xl text-[10px] font-black uppercase">
+                {isDeleting ? <Loader2 className="animate-spin" size={18} /> : "Confirm Deletion"}
               </button>
-              <button 
-                onClick={() => setIsDeleteModalOpen(false)}
-                className="w-full py-4 bg-slate-900 border border-slate-800 text-slate-500 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
-              >
-                Abort Mission
-              </button>
+              <button onClick={() => setIsDeleteModalOpen(false)} className="w-full py-4 bg-slate-900 text-slate-500 rounded-2xl text-[10px] font-black uppercase">Abort Mission</button>
             </div>
           </div>
         </div>
@@ -509,9 +451,5 @@ const UserManager: React.FC = () => {
     </div>
   );
 };
-
-const ChevronRight = ({ size, className }: { size: number, className: string }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>
-);
 
 export default UserManager;

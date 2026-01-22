@@ -34,6 +34,8 @@ import OwnerMediaManager from "./DashBoards/Owner DashBoard/OwnerMediaManager";
 import OwnerAmenityManager from "./DashBoards/Owner DashBoard/OwnerAmenityManager";
 import OwnerReviewManager from "./DashBoards/Owner DashBoard/OwnerReveiwMnager";
 import UserProfileManager from "./DashBoards/Owner DashBoard/OwnerProfile";
+import StaffManager from "./DashBoards/Owner DashBoard/Staffmanager";
+import AdminAnalytics from "./DashBoards/Admin-Dashboard/AsminAnalyticPage";
 
 
 const App = () => {
@@ -122,6 +124,8 @@ const App = () => {
         { path: "manage-reviews", element: <ReviewManager /> },
         { path: "manage-users", element: <ManageUsers /> },
         { path: "Hostel-verifications", element: <AdminVerificationPanel /> },
+        { path: "profile", element: <UserProfileManager/> },
+        { path: "analytics", element: <AdminAnalytics/> },
       ],
     },
     {
@@ -138,7 +142,8 @@ const App = () => {
         { path: "media", element: <OwnerMediaManager /> },
         { path: "amenities", element: <OwnerAmenityManager /> },
         { path: "reviews", element: <OwnerReviewManager/> },
-         { path: "profile", element: <UserProfileManager/> },
+        { path: "profile", element: <UserProfileManager/> },
+        { path: "staffs", element: <StaffManager/> },
       ],
     },
     {

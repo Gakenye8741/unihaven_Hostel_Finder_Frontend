@@ -10,21 +10,22 @@ import {
   ShieldHalf,
   Wifi,
   GitCommitVerticalIcon,
-  List
+  List,
+  GitGraph
 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { clearCredentials } from "../../features/Auth/Auth.slice";
 
 const navItems = [
-  { name: "Dashboard", path: "/admin-dashboard", icon: <LayoutDashboard className="text-indigo-400" size={18} /> },
+  { name: "analytics", path: "analytics", icon: <GitGraph className="text-indigo-400" size={18} /> },
   { name: "Manage Hostels", path: "Manage-hostels", icon: <Building2 className="text-blue-400" size={18} /> },
   { name: "Manage Rooms", path: "Manage-rooms", icon: <BedDouble className="text-pink-500" size={18} /> },
   { name: "Media Gallery", path: "product-media", icon: <ImageIcon className="text-green-400" size={18} /> },
   { name: "Amenity Manager", path: "Manage-Amenities", icon: <Wifi className="text-orange-600" size={18} /> },
    { name: "Review Manager", path: "Manage-Reviews", icon: <GitCommitVerticalIcon className="text-shadow-lime-600" size={18} /> },
   { name: "Hostel verifications", path: "Hostel-verifications", icon: <List className="text-yellow-400" size={18} /> },
-  { name: "My Profile", path: "adminprofile", icon: <User className="text-purple-400" size={18} /> },
-  { name: "Settings", path: "settings", icon: <Settings className="text-teal-400" size={18} /> },
+  { name: "User-Manager", path: "manage-users", icon: <User className="text-purple-400" size={18} /> },
+  { name: "Admin Profile", path: "profile", icon: <Settings className="text-teal-400" size={18} /> },
   { name: "Logout", path: "#", icon: <LogOut className="text-red-500" size={18} /> },
 ];
 
