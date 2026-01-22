@@ -39,7 +39,13 @@ const HostelManager: React.FC = () => {
   const itemsPerPage = 6;
 
   // --- FORM STATE ---
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    campus: string;
+    address: string;
+    description: string;
+    policy: 'Mixed' | 'Male Only' | 'Female Only';
+  }>({
     name: '',
     campus: '',
     address: '',
@@ -81,7 +87,7 @@ const HostelManager: React.FC = () => {
 
   const handleToggleVerification = async (hostel: any) => {
     try {
-      await updateHostel({ id: `verify/${hostel.id}`, status: !hostel.isVerified }).unwrap();
+      await updateHostel({ id: hostel.id, isVerified: !hostel.isVerified }).unwrap();
       toast.success(`Verification ${!hostel.isVerified ? 'enabled' : 'disabled'}`);
     } catch (err) {
       toast.error("Admin privileges required");
@@ -321,7 +327,7 @@ const HostelManager: React.FC = () => {
                   </div>
                   <div className="space-y-2">
                     <label className="text-[9px] font-black uppercase text-slate-500 tracking-widest ml-1">Gender Policy</label>
-                    <select value={formData.policy} onChange={(e) => setFormData({...formData, policy: e.target.value})} className="w-full bg-slate-900/60 border border-white/5 rounded-xl py-4 px-5 text-xs focus:border-indigo-500/50 outline-none cursor-pointer">
+                    <select value={formData.policy} onChange={(e) => setFormData({...formData, policy: e.target.value as 'Mixed' | 'Male Only' | 'Female Only'})} className="w-full bg-slate-900/60 border border-white/5 rounded-xl py-4 px-5 text-xs focus:border-indigo-500/50 outline-none cursor-pointer">
                       <option value="Mixed">Mixed Housing</option>
                       <option value="Female Only">Female Only</option>
                       <option value="Male Only">Male Only</option>

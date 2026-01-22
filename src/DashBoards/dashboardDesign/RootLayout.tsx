@@ -1,11 +1,11 @@
 
 import { Outlet } from "react-router-dom";
-import TokenExpiryWatcher from "../../components/TokenWatcher";
+// import TokenExpiryWatcher from "../../components/TokenWatcher";
 
 const RootLayout = () => {
   return (
     <>
-      <TokenExpiryWatcher/>
+      {/* <TokenExpiryWatcher/> */}
       <Outlet />
     </>
   );

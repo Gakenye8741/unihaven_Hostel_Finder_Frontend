@@ -4,7 +4,7 @@ interface CardProps {
     children: ReactNode;
 }
 
-const Card: React.FC<CardProps> = ({ children }) =>  {
+const OwnerCard: React.FC<CardProps> = ({ children }) =>  {
     return (
         <div className="p-3">
             {children}
@@ -12,4 +12,4 @@ const Card: React.FC<CardProps> = ({ children }) =>  {
     )
 }
 
-export default Card
+export default OwnerCard;

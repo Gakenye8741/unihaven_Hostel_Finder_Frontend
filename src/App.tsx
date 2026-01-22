@@ -26,6 +26,15 @@ import About from "./Pages/About";
 import SafetyTrust from "./Pages/Saftey";
 import FAQ from "./Pages/Faq";
 import Contact from "./Pages/Contact";
+import Legal from "./Pages/Legal";
+import MyHostels from "./DashBoards/Owner DashBoard/MyHostels";
+import { OwnerDashBoard } from "./Pages/OwnerDashboard";
+import OwnerRoomManager from "./DashBoards/Owner DashBoard/HostelManager";
+import OwnerMediaManager from "./DashBoards/Owner DashBoard/OwnerMediaManager";
+import OwnerAmenityManager from "./DashBoards/Owner DashBoard/OwnerAmenityManager";
+import OwnerReviewManager from "./DashBoards/Owner DashBoard/OwnerReveiwMnager";
+import UserProfileManager from "./DashBoards/Owner DashBoard/OwnerProfile";
+
 
 const App = () => {
   const router = createBrowserRouter([
@@ -93,6 +102,9 @@ const App = () => {
     {
       path: '/contact',
       element: <Contact />
+    },{
+      path: '/legal',
+      element: <Legal />
     },
     {
       path: '/admin-dashboard',
@@ -101,7 +113,7 @@ const App = () => {
           <AdminDashBoard />
         </ProtectedRoutes>
       ),
-      errorElement: <NotFound />, // Catch sub-route errors
+      errorElement: <NotFound />, 
       children: [
         { path: "manage-hostels", element: <HostelManager /> },
         { path: "manage-rooms", element: <RoomManager /> },
@@ -112,7 +124,23 @@ const App = () => {
         { path: "Hostel-verifications", element: <AdminVerificationPanel /> },
       ],
     },
-    // Explicit Catch-all for 404s
+    {
+      path: '/owner-dashboard',
+      element: (
+        <ProtectedRoutes>
+          <OwnerDashBoard /> 
+        </ProtectedRoutes>
+      ),
+      errorElement: <NotFound />, 
+      children: [
+        { path: "my-hostels", element: <MyHostels /> },
+        { path: "rooms", element: <OwnerRoomManager /> },
+        { path: "media", element: <OwnerMediaManager /> },
+        { path: "amenities", element: <OwnerAmenityManager /> },
+        { path: "reviews", element: <OwnerReviewManager/> },
+         { path: "profile", element: <UserProfileManager/> },
+      ],
+    },
     {
       path: "*",
       element: <NotFound />
@@ -121,7 +149,6 @@ const App = () => {
 
   return (
     <>
-      {/* Premium Dark Theme Toaster */}
       <Toaster 
         position="top-right" 
         reverseOrder={false} 
@@ -129,9 +156,9 @@ const App = () => {
         toastOptions={{
           duration: 5000,
           style: {
-            background: '#0F172A', // Slate-900
-            color: '#F1F5F9', // Slate-100
-            border: '1px solid rgba(99, 102, 241, 0.2)', // Indigo border
+            background: '#0F172A', 
+            color: '#F1F5F9', 
+            border: '1px solid rgba(99, 102, 241, 0.2)', 
             fontSize: '12px',
             fontWeight: '900',
             textTransform: 'uppercase',
@@ -141,7 +168,7 @@ const App = () => {
           },
           success: {
             iconTheme: {
-              primary: '#6366F1', // Indigo-500
+              primary: '#6366F1', 
               secondary: '#fff',
             },
           },
