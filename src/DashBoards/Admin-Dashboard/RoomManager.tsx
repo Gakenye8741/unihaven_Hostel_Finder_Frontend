@@ -118,10 +118,10 @@ const RoomManager: React.FC = () => {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-400">Unit Control / {adminName}</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-400">Hey {adminName}</p>
             </div>
             <h1 className="text-4xl md:text-5xl font-black text-white italic tracking-tighter uppercase leading-none">
-              Room<span className="text-indigo-500 font-light not-italic">Matrix</span>
+              Room<span className="text-indigo-500 font-light not-italic">Manager</span>
             </h1>
           </div>
 
@@ -133,7 +133,7 @@ const RoomManager: React.FC = () => {
                 onChange={(e) => setSelectedHostelId(e.target.value)}
                 className="bg-slate-900 border border-white/10 rounded-2xl py-4 pl-12 pr-10 text-[11px] font-bold uppercase tracking-widest text-white appearance-none outline-none focus:border-indigo-500 transition-all min-w-[280px]"
               >
-                <option value="">Select Hostel Infrastructure</option>
+                <option value="">Select Hostel </option>
                 {hostels?.map((h: any) => (
                   <option key={h.id} value={h.id}>{h.name}</option>
                 ))}
@@ -171,12 +171,12 @@ const RoomManager: React.FC = () => {
             <div className="p-6 bg-slate-900/50 rounded-full mb-6">
                 <AlertCircle className="text-slate-700" size={48} />
             </div>
-            <p className="text-slate-500 font-black uppercase tracking-[0.3em] text-[10px]">Awaiting Infrastructure Selection</p>
+            <p className="text-slate-500 font-black uppercase tracking-[0.3em] text-[10px]">Awaiting Hostel Selection</p>
           </div>
         ) : isRoomsLoading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="animate-spin text-indigo-500 mb-4" size={40} />
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-600">Syncing Matrix Data...</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-600">FETCHING ROOMS...</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-in fade-in duration-700">
@@ -206,10 +206,7 @@ const RoomManager: React.FC = () => {
                         <span className="text-slate-500">Rent</span>
                         <span className="text-white">KES {room.price} <span className="text-[8px] text-slate-600 font-medium">/{room.billingCycle === 'Per Semester' ? 'Sem' : 'Mo'}</span></span>
                     </div>
-                    <div className="flex justify-between text-[10px] font-bold uppercase tracking-tight">
-                        <span className="text-slate-500">Status</span>
-                        <span className={room.status === 'Available' ? 'text-emerald-500' : 'text-rose-500'}>{room.occupiedSlots} / {room.totalSlots} Slots</span>
-                    </div>
+                   
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 relative z-10">
@@ -290,7 +287,7 @@ const RoomManager: React.FC = () => {
               <button type="button" onClick={() => setIsPanelOpen(false)} className="flex-1 py-4 text-[9px] font-black uppercase tracking-widest text-slate-500 hover:text-white transition-all">Discard</button>
               <button onClick={handleSubmit} disabled={isCreating || isUpdating} className="flex-[2] py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl text-[9px] font-black uppercase tracking-widest shadow-xl shadow-indigo-500/20 transition-all flex items-center justify-center gap-3">
                 {isCreating || isUpdating ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle2 size={16} />}
-                {editingId ? 'Update Matrix' : 'Commit to Registry'}
+                {editingId ? 'Update Rooms' : 'Add Rooms'}
               </button>
             </div>
           </div>

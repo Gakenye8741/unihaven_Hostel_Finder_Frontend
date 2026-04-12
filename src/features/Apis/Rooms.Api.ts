@@ -1,7 +1,8 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '../../App/store'; 
-// Define the Room interface for TypeScript support
+
 export interface Room {
+  amenities: never[];
   id: string;
   hostelId: string;
   label: string;
@@ -19,9 +20,8 @@ export interface Room {
 export const roomApi = createApi({
   reducerPath: 'roomApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://unihavenbackend-cbg9b5gbdce6fug7.southafricanorth-01.azurewebsites.net/api/',
+    baseUrl: 'http://localhost:5000/api/',
     prepareHeaders: (headers, { getState }) => {
-      // Pulling token from your persisted auth state
       const token = (getState() as RootState).auth.token;
       if (token) {
         headers.set('authorization', `Bearer ${token}`);
@@ -31,8 +31,6 @@ export const roomApi = createApi({
   }),
   tagTypes: ['Rooms', 'Stats'],
   endpoints: (builder) => ({
-    
-    // 🏗️ 1. Create a New Room
     createRoom: builder.mutation<Room, Partial<Room>>({
       query: (newRoom) => ({
         url: 'rooms',
@@ -41,8 +39,6 @@ export const roomApi = createApi({
       }),
       invalidatesTags: ['Rooms', 'Stats'],
     }),
-
-    // 📋 2. List All Rooms in a Hostel
     listRoomsByHostel: builder.query<Room[], string>({
       query: (hostelId) => `rooms/list/${hostelId}`,
       providesTags: (result) =>
@@ -50,8 +46,6 @@ export const roomApi = createApi({
           ? [...result.map(({ id }) => ({ type: 'Rooms' as const, id })), { type: 'Rooms', id: 'LIST' }]
           : [{ type: 'Rooms', id: 'LIST' }],
     }),
-
-    // ✏️ 3. Update Room Details
     updateRoom: builder.mutation<Room, { hostelId: string; roomId: string; body: Partial<Room> }>({
       query: ({ hostelId, roomId, body }) => ({
         url: `rooms/update/${hostelId}/${roomId}`,
@@ -60,8 +54,6 @@ export const roomApi = createApi({
       }),
       invalidatesTags: (result, error, { roomId }) => [{ type: 'Rooms', id: roomId }, 'Rooms'],
     }),
-
-    // 🔄 4. Manual Status Overrides (Maintenance / Available / Full)
     updateRoomStatus: builder.mutation<Room, { roomId: string; status: string }>({
       query: ({ roomId, status }) => ({
         url: `rooms/status/${roomId}`,
@@ -70,14 +62,10 @@ export const roomApi = createApi({
       }),
       invalidatesTags: (result, error, { roomId }) => [{ type: 'Rooms', id: roomId }, 'Stats'],
     }),
-
-    // 📊 5. Get Hostel Occupancy Stats
     getHostelStats: builder.query<{ totalRooms: number; occupied: number; available: number }, string>({
       query: (hostelId) => `rooms/stats/${hostelId}`,
       providesTags: ['Stats'],
     }),
-
-    // 🗑️ 6. Delete a Room
     deleteRoom: builder.mutation<{ success: boolean }, { hostelId: string; roomId: string }>({
       query: ({ hostelId, roomId }) => ({
         url: `rooms/delete/${hostelId}/${roomId}`,
@@ -85,11 +73,9 @@ export const roomApi = createApi({
       }),
       invalidatesTags: ['Rooms', 'Stats'],
     }),
-
   }),
 });
 
-// ✅ Export hooks for use in components
 export const {
   useCreateRoomMutation,
   useListRoomsByHostelQuery,

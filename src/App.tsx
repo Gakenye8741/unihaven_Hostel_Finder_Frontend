@@ -36,6 +36,10 @@ import OwnerReviewManager from "./DashBoards/Owner DashBoard/OwnerReveiwMnager";
 import UserProfileManager from "./DashBoards/Owner DashBoard/OwnerProfile";
 import StaffManager from "./DashBoards/Owner DashBoard/Staffmanager";
 import AdminAnalytics from "./DashBoards/Admin-Dashboard/AsminAnalyticPage";
+import StudentWishlist from "./DashBoards/dashboard/Wishlist";
+import { StudentDashBoard } from "./Pages/StudentDashboard";
+import MyReviews from "./DashBoards/dashboard/MyReviews";
+import StudentAnalytics from "./DashBoards/dashboard/Analytics";
 
 
 const App = () => {
@@ -146,6 +150,25 @@ const App = () => {
         { path: "staffs", element: <StaffManager/> },
       ],
     },
+     {
+      path: '/student-dashboard',
+      element: (
+        <ProtectedRoutes>
+          <StudentDashBoard /> 
+        </ProtectedRoutes>
+      ),
+      errorElement: <NotFound />, 
+      children: [
+        { path: "my-wishlist", element: <StudentWishlist /> },
+        { path: "my-reviews", element: <MyReviews /> },
+        { path: "my-analytics", element: <StudentAnalytics /> },
+        { path: "amenities", element: <OwnerAmenityManager /> },
+        { path: "reviews", element: <OwnerReviewManager/> },
+        { path: "profile", element: <UserProfileManager/> },
+        { path: "staffs", element: <StaffManager/> },
+      ],
+    },
+    
     {
       path: "*",
       element: <NotFound />

@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '../../App/store'; 
 
-// Define types for the Review data based on your response structure
+// --- INTERFACES ---
 export interface Review {
   id: string;
   userId: string;
@@ -13,30 +13,43 @@ export interface Review {
   repliedAt: string | null;
   isVerified: boolean;
   helpfulCount: number;
+  isFlagged: boolean;      
+  reportReason: string | null; 
   createdAt: string;
   updatedAt: string;
 }
 
+/**
+ * Enhanced Stats Interface 
+ * Now includes peakHour for the activity clock on the dashboard
+ */
 export interface ReviewStats {
-  averageRating: number;
   totalReviews: number;
+  totalHelpful: number;
+  reportedCount: number;
+  peakHour: number | null; 
 }
 
 export interface HostelReviewsResponse {
-  stats: ReviewStats;
+  stats: {
+    totalReviews: number;
+    averageRating?: number;
+  };
+  distribution?: { rating: number; count: number }[]; 
   reviews: Review[];
 }
 
 export const reviewApi = createApi({
   reducerPath: 'reviewApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://unihavenbackend-cbg9b5gbdce6fug7.southafricanorth-01.azurewebsites.net/api/reviews/',
+    baseUrl: 'http://localhost:5000/api/reviews',
     prepareHeaders: (headers, { getState }) => {
-      // Pulling token from your AuthSlice
-      const token = (getState() as RootState).auth.token; 
+      const state = getState() as RootState;
+      const token = state.auth?.token; 
+
       if (token) {
-        // Cleaning token of quotes if necessary and setting Bearer header
-        const cleanToken = token.replace(/"/g, '');
+        // Cleaning potential JSON stringification quotes from localStorage
+        const cleanToken = token.toString().trim().replace(/^"|"$/g, '');
         headers.set('authorization', `Bearer ${cleanToken}`);
       }
       return headers;
@@ -45,67 +58,133 @@ export const reviewApi = createApi({
   tagTypes: ['Review'],
   endpoints: (builder) => ({
     
-    // 🌍 GET: List reviews and stats for a specific hostel (Public)
-    // Matches: GET /api/reviews/hostel/:hostelId
+    // 🌍 GET: Fetch All Reviews (Admin/Moderator View)
+    getAllReviews: builder.query<HostelReviewsResponse, void>({
+      query: () => '/all',
+      providesTags: (result) => 
+        result 
+          ? [
+              ...result.reviews.map(({ id }) => ({ type: 'Review' as const, id })), 
+              { type: 'Review', id: 'LIST' }
+            ]
+          : [{ type: 'Review', id: 'LIST' }],
+    }),
+
+    // 👤 GET: Fetch Personal Reviews (The "My Reviews" Vault)
+    getMyReviews: builder.query<HostelReviewsResponse, void>({
+      query: () => '/me',
+      providesTags: (result) => 
+        result 
+          ? [
+              ...result.reviews.map(({ id }) => ({ type: 'Review' as const, id })), 
+              { type: 'Review', id: 'PERSONAL_LIST' }
+            ]
+          : [{ type: 'Review', id: 'PERSONAL_LIST' }],
+    }),
+
+    // 📊 GET: User Review Stats (For the Analytics Hub)
+    // Synchronized with the updated controller that returns peakHour
+    getUserReviewStats: builder.query<{ message: string; stats: ReviewStats }, void>({
+      query: () => '/stats/me',
+      providesTags: ['Review'], // Will refetch when any review mutation occurs
+    }),
+
+    // 🏠 GET: Reviews for a specific hostel
     getHostelReviews: builder.query<HostelReviewsResponse, string>({
-      query: (hostelId) => `hostel/${hostelId}`,
+      query: (hostelId) => `/hostel/${hostelId}`,
       providesTags: (result, error, hostelId) => [{ type: 'Review', id: hostelId }],
     }),
 
-    // ✍️ POST: Create a new review (Student/Logged-in)
-    // Matches: POST /api/reviews/
+    // ✍️ POST: Create a Review
     createReview: builder.mutation<Review, Partial<Review>>({
       query: (newReview) => ({
-        url: '',
+        url: '/',
         method: 'POST',
         body: newReview,
       }),
-      // Invalidate the specific hostel tag to refresh the list
-      invalidatesTags: (result, error, { hostelId }) => [
-        { type: 'Review', id: hostelId }
+      invalidatesTags: [
+        { type: 'Review', id: 'LIST' },
+        { type: 'Review', id: 'PERSONAL_LIST' }
       ],
     }),
 
-    // ✏️ PATCH: Update own review (Student)
-    // Matches: PATCH /api/reviews/:id
+    // ✏️ PATCH: Update Own Review
     updateReview: builder.mutation<Review, { id: string; title?: string; rating?: number; comment?: string }>({
       query: ({ id, ...patch }) => ({
-        url: `${id}`,
+        url: `/${id}`, 
         method: 'PATCH',
         body: patch,
       }),
-      invalidatesTags: ['Review'],
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'Review', id }, 
+        { type: 'Review', id: 'LIST' },
+        { type: 'Review', id: 'PERSONAL_LIST' }
+      ],
     }),
 
-    // 💬 PATCH: Management reply to review (Owner/Caretaker)
-    // Matches: PATCH /api/reviews/reply/:id
+    // 👍 PATCH: Mark Helpful (Like)
+    markHelpful: builder.mutation<Review, string>({
+      query: (id) => ({
+        url: `/${id}/helpful`,
+        method: 'PATCH',
+      }),
+      invalidatesTags: (result, error, id) => [
+        { type: 'Review', id },
+        { type: 'Review', id: 'PERSONAL_LIST' } // Force refresh to update totalHelpful count
+      ],
+    }),
+
+    // 💬 PATCH: Management Reply
     replyToReview: builder.mutation<Review, { id: string; ownerReply: string }>({
       query: ({ id, ownerReply }) => ({
-        url: `reply/${id}`,
+        url: `/reply/${id}`,
         method: 'PATCH',
         body: { ownerReply },
       }),
-      invalidatesTags: ['Review'],
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'Review', id }, 
+        { type: 'Review', id: 'LIST' },
+        { type: 'Review', id: 'PERSONAL_LIST' }
+      ],
     }),
 
-    // 🗑️ DELETE: Remove a review (Student or Admin)
-    // Matches: DELETE /api/reviews/:id
+    // 🚩 POST: Report Review
+    reportReview: builder.mutation<Review, { id: string; reason: string }>({
+      query: ({ id, reason }) => ({
+        url: `/${id}/report`,
+        method: 'POST',
+        body: { reason },
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'Review', id },
+        { type: 'Review', id: 'LIST' }
+      ],
+    }),
+
+    // 🗑️ DELETE: Remove Review
     deleteReview: builder.mutation<{ message: string }, string>({
       query: (id) => ({
-        url: `${id}`,
+        url: `/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['Review'],
+      invalidatesTags: [
+        { type: 'Review', id: 'LIST' },
+        { type: 'Review', id: 'PERSONAL_LIST' }
+      ],
     }),
 
   }),
 });
 
-// ✅ Export hooks for components
 export const {
+  useGetAllReviewsQuery,
+  useGetMyReviewsQuery,
+  useGetUserReviewStatsQuery, 
   useGetHostelReviewsQuery,
   useCreateReviewMutation,
   useUpdateReviewMutation,
+  useMarkHelpfulMutation,
   useReplyToReviewMutation,
+  useReportReviewMutation,
   useDeleteReviewMutation,
 } = reviewApi;

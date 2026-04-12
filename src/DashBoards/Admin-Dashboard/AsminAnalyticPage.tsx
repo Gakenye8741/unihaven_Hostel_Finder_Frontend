@@ -97,7 +97,7 @@ const AdminAnalytics: React.FC = () => {
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-400">Live Command Center</span>
             </div>
             <h1 className="text-4xl font-black text-white uppercase italic tracking-tighter flex items-center gap-3">
-              Admin<span className="text-indigo-500 not-italic font-thin">Pulse</span>
+              Admin<span className="text-indigo-500 not-italic font-thin">Analytics</span>
             </h1>
             <div className="flex gap-4 mt-2">
                <div className="flex items-center gap-2 text-[9px] font-bold uppercase text-slate-500 bg-slate-900/50 px-3 py-1 rounded-full border border-slate-800">

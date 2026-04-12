@@ -128,14 +128,11 @@ const HostelManager: React.FC = () => {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-400">Control Protocol / {adminFirstName}</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-400">Hey {adminFirstName}</p>
             </div>
             <h1 className="text-4xl md:text-5xl font-black text-white italic tracking-tighter uppercase leading-none">
-              Hostel<span className="text-indigo-500 font-light not-italic">Vault</span>
+              Hostel<span className="text-indigo-500 font-light not-italic">Manager</span>
             </h1>
-            <p className="text-xs text-slate-500 mt-4 max-w-2xl leading-relaxed">
-              Welcome to the central management hub. This interface provides <span className="text-slate-200">administrative oversight</span> for the entire property network. You can register new facilities, audit location data, and <span className="text-indigo-400">verify security compliance</span> across all partner campuses.
-            </p>
           </div>
           <button 
             onClick={() => handleOpenPanel()}
@@ -145,24 +142,7 @@ const HostelManager: React.FC = () => {
           </button>
         </div>
 
-        {/* SYSTEM OVERVIEW CARDS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-          <div className="bg-[#0F172A]/40 p-5 rounded-2xl border border-slate-800/60 transition-all hover:bg-[#0F172A]/60">
-            <Terminal size={18} className="text-indigo-500 mb-3" />
-            <h3 className="text-[10px] font-black uppercase tracking-widest text-white mb-1">Audit Control</h3>
-            <p className="text-[10px] text-slate-500 leading-normal">Deep-edit property metadata, GPS mapping, and contact info.</p>
-          </div>
-          <div className="bg-[#0F172A]/40 p-5 rounded-2xl border border-slate-800/60 transition-all hover:bg-[#0F172A]/60">
-            <ShieldCheck size={18} className="text-emerald-500 mb-3" />
-            <h3 className="text-[10px] font-black uppercase tracking-widest text-white mb-1">Verify Engine</h3>
-            <p className="text-[10px] text-slate-500 leading-normal">Toggle trust badges for properties passing official safety inspections.</p>
-          </div>
-          <div className="bg-[#0F172A]/40 p-5 rounded-2xl border border-slate-800/60 transition-all hover:bg-[#0F172A]/60">
-            <LayoutGrid size={18} className="text-pink-500 mb-3" />
-            <h3 className="text-[10px] font-black uppercase tracking-widest text-white mb-1">Policy Sync</h3>
-            <p className="text-[10px] text-slate-500 leading-normal">Manage gender segregation and facility-specific house rules.</p>
-          </div>
-        </div>
+    
 
         {/* FILTERS BAR */}
         <div className="mt-8 flex flex-wrap items-center gap-3 bg-slate-900/20 p-2 rounded-xl border border-slate-800/40">
@@ -201,7 +181,7 @@ const HostelManager: React.FC = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-900/50 border-b border-slate-800/50">
-                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Property Identity</th>
+                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Property Name</th>
                 <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 text-center">Status</th>
                 <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 text-right">Actions</th>
               </tr>

@@ -98,7 +98,7 @@ const AmenityManager: React.FC = () => {
             </div>
             <div>
               <h1 className="text-3xl font-black text-white tracking-tighter uppercase italic">
-                Amenity<span className="text-indigo-500 not-italic">Control</span>
+                Amenity<span className="text-indigo-500 not-italic">Manager</span>
               </h1>
               <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">System Infrastructure Management</p>
             </div>

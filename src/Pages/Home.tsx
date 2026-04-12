@@ -2,24 +2,20 @@ import React from 'react';
 
 // Layout & Navigation
 import Navbar from '../Components/Navbar';
-
+import Footer from '../Components/Footer';
 
 // Discovery Components
 import Hero from '../Components/Home components/Hero-Section';
-
-
+import CampusSlider from '../Components/Home components/CampusSlider';
+import Neighborhoods from '../Components/Home components/Neighbourhood';
 
 // Trust & Value Components
 import SecurityBanner from '../Components/Home components/SecurityBanner';
 import Testimonials from '../Components/Home components/Testimonials';
-import Neighborhoods from '../Components/Home components/Neighbourhood';
 import Features from '../Components/Home components/FeaturedHostels';
-import ManagerCTA from '../Components/Home components/cta';
-import Footer from '../Components/Footer';
-import CampusSlider from '../Components/Home components/CampusSlider';
 
 // Action Components
-
+import ManagerCTA from '../Components/Home components/cta';
 
 const Home: React.FC = () => {
   return (
@@ -28,6 +24,8 @@ const Home: React.FC = () => {
       <Navbar />
 
       <main>
+
+
         {/* 2. HERO: Immediate search intent */}
         <Hero />
 
@@ -45,10 +43,10 @@ const Home: React.FC = () => {
         {/* 6. NEIGHBORHOODS: Secondary discovery (Location-based) */}
         <Neighborhoods />
 
-        {/* 7. FEATURES: Explaining the logistical value/process */}
+        {/* 7. FEATURES: Explaining the logistical value/process (Visual/Direct Connect) */}
         <Features />
 
-        {/* 8. TESTIMONIALS: Social proof to close the deal */}
+        {/* 8. TESTIMONIALS: Social proof (Fetched from Review API) */}
         <Testimonials />
 
         {/* 9. OWNER CTA: B2B onboarding for property managers */}

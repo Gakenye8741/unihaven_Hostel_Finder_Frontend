@@ -48,17 +48,17 @@ const Navbar: React.FC = () => {
   const handleLogout = () => {
     dispatch(clearCredentials());
     setMenuOpen(false);
-    toast.success("Logged out successfully", {
-      id: "logout-toast",
-      icon: '🏠',
-      style: {
-        background: '#0F172A',
-        color: '#6366F1',
-        fontSize: '10px',
-        letterSpacing: '0.2em',
-        border: '1px solid #6366F1'
-      },
-    });
+    // toast.success("Logged out successfully", {
+    //   id: "logout-toast",
+    //   icon: '🏠',
+    //   style: {
+    //     background: '#0F172A',
+    //     color: '#6366F1',
+    //     fontSize: '10px',
+    //     letterSpacing: '0.2em',
+    //     border: '1px solid #6366F1'
+    //   },
+    // });
     navigate("/login");
   };
 

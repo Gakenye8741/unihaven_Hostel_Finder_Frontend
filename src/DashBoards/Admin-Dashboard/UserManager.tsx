@@ -164,7 +164,7 @@ const UserManager: React.FC = () => {
               <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">{stat.role}s</span>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-black text-white italic tracking-tighter">{stat.count}</span>
-                <span className="text-[8px] text-slate-500 font-bold uppercase">Nodes Active</span>
+                <span className="text-[8px] text-slate-500 font-bold uppercase">Active</span>
               </div>
             </div>
           ))}
@@ -173,18 +173,18 @@ const UserManager: React.FC = () => {
         <header className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <h1 className="text-3xl md:text-4xl font-black text-white italic uppercase leading-none">
-              User<span className="text-indigo-500 font-light not-italic">Matrix</span>
+              User<span className="text-indigo-500 font-light not-italic">Manager</span>
             </h1>
             <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-2 font-bold flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Live Identity Management
+              Live User Management
             </p>
           </div>
           <div className="relative w-full md:w-80 group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-500 transition-colors" size={14} />
             <input 
                type="text" 
-               placeholder="Search by name, email or handle..." 
+               placeholder="Search by name, email......." 
                value={searchTerm} 
                onChange={(e) => setSearchTerm(e.target.value)} 
                className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3.5 pl-11 pr-4 text-xs outline-none focus:border-indigo-500/50 transition-all text-white" 
@@ -198,8 +198,8 @@ const UserManager: React.FC = () => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-950/40 border-b border-slate-800/50">
-                  <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500">Identity Details</th>
-                  <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500">Node Role</th>
+                  <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500">User Details</th>
+                  <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500">Role</th>
                   <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500">System Status</th>
                   <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">Access</th>
                 </tr>

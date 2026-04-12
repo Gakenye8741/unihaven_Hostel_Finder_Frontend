@@ -12,6 +12,7 @@ import { mediaApi } from "../features/Apis/Media.Api";
 import { amenityApi } from "../features/Apis/Amenities.Api";
 import { reviewApi } from "../features/Apis/Review.Api";
 import { usersApi } from "../features/Apis/Users.Api";
+import { wishlistApi } from "../features/Apis/Wishlist.Api";
 
 const authPersistConfiguration = {
     key: 'auth',
@@ -33,6 +34,7 @@ export const store = configureStore({
         [amenityApi.reducerPath]: amenityApi.reducer,
         [reviewApi.reducerPath]: reviewApi.reducer,
         [usersApi.reducerPath]: usersApi.reducer,
+        [wishlistApi.reducerPath]: wishlistApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
@@ -47,6 +49,7 @@ export const store = configureStore({
             amenityApi.middleware,
             reviewApi.middleware,
             usersApi.middleware,
+            wishlistApi.middleware,
         )
 });
 

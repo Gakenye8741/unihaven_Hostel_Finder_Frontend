@@ -122,10 +122,10 @@ const MediaManager: React.FC = () => {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-400">Visual Control / {adminName}</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-400">Hey {adminName}</p>
             </div>
             <h1 className="text-4xl md:text-5xl font-black text-white italic tracking-tighter uppercase leading-none">
-              Media<span className="text-indigo-500 font-light not-italic">Vault</span>
+              Media<span className="text-indigo-500 font-light not-italic">Manager</span>
             </h1>
           </div>
 
@@ -219,7 +219,7 @@ const MediaManager: React.FC = () => {
 
                 {/* REMOTE URL SECTION */}
                 <div className="space-y-4">
-                    <SectionTitle icon={<Globe size={14}/>} title="Remote Asset Proxy" />
+                    <SectionTitle icon={<Globe size={14}/>} title="Remote Asset URL" />
                     <div className="relative">
                         <ExternalLink size={16} className="absolute left-5 top-5 text-indigo-500" />
                         <input 

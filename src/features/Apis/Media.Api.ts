@@ -4,7 +4,7 @@ import type { RootState } from '../../App/store';
 export const mediaApi = createApi({
   reducerPath: 'mediaApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://unihavenbackend-cbg9b5gbdce6fug7.southafricanorth-01.azurewebsites.net/api/',
+    baseUrl: 'http://localhost:5000/api/',
     prepareHeaders: (headers, { getState }) => {
       // Accessing the token from your AuthSlice
       const token = (getState() as RootState).auth.token;
