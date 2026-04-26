@@ -23,11 +23,7 @@ const navItems = [
   { name: "My WishList", path: "my-wishlist", icon: <Building2 className="text-blue-400" size={18} /> },
   { name: "My Reviews", path: "my-reviews", icon: <BedDouble className="text-pink-500" size={18} /> },
   { name: "Analytics", path: "my-analytics", icon: <ImageIcon className="text-green-400" size={18} /> },
-  { name: "Amenities", path: "amenities", icon: <Wifi className="text-orange-600" size={18} /> },
-  { name: "Review Manager", path: "reviews", icon: <MessageCircle  className="text-lime-500" size={18} /> },
-  { name: "Maintenance", path: "maintenance", icon: <HardHat className="text-yellow-400" size={18} /> },
   { name: "My Profile", path: "profile", icon: <User className="text-purple-400" size={18} /> },
-  { name: "Staff Manager", path: "staffs", icon: <Workflow className="text-teal-400" size={18} /> },
   { name: "Logout", path: "#", icon: <LogOut className="text-red-500" size={18} /> },
 ];
 
