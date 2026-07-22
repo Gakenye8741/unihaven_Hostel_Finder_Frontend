@@ -4,7 +4,7 @@ import type { RootState } from '../../App/store';
 export const authApi = createApi({
   reducerPath: 'authApi',
   baseQuery: fetchBaseQuery({ 
-    baseUrl: 'https://unihavenbackend-cbg9b5gbdce6fug7.southafricanorth-01.azurewebsites.net/api/auth/',
+    baseUrl: 'https://unihaven-hostel-finder-backnd-1.onrender.com/api/auth/',
     prepareHeaders: (headers, { getState }) => {
       // Pull token from the auth state to authorize the change-password request
       const token = (getState() as RootState).auth.token; 

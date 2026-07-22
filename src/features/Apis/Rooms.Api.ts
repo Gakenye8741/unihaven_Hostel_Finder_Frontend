@@ -20,7 +20,7 @@ export interface Room {
 export const roomApi = createApi({
   reducerPath: 'roomApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://unihavenbackend-cbg9b5gbdce6fug7.southafricanorth-01.azurewebsites.net/api/',
+    baseUrl: 'https://unihaven-hostel-finder-backnd-1.onrender.com/api/',
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as RootState).auth.token;
       if (token) {
